@@ -9,6 +9,9 @@ def probe_pid(pid: int) -> dict[str, Any]:
     observations: dict[str, Any] = {"pid": pid}
     if pid <= 0:
         return {"status": "failed", "category": "invalid_pid", "owned": False, "observations": observations}
+    psutil_probe = _psutil_probe(pid)
+    if psutil_probe is not None:
+        return psutil_probe
     proc_dir = Path("/proc") / str(pid)
     if not proc_dir.exists():
         return {"status": "passed", "category": "missing", "owned": False, "observations": observations}
@@ -80,6 +83,34 @@ def _children(pid: int) -> list[int]:
         if ppid == pid:
             children.append(int(entry.name))
     return sorted(children)
+
+
+def _psutil_probe(pid: int) -> dict[str, Any] | None:
+    try:
+        import psutil
+    except ImportError:
+        return None
+    try:
+        proc = psutil.Process(pid)
+        observations = {
+            "pid": pid,
+            "executable": proc.exe(),
+            "argv": proc.cmdline(),
+            "starttime": str(proc.create_time()),
+            "children": [child.pid for child in proc.children()],
+            "psutil": True,
+            "create_time": proc.create_time(),
+        }
+        return {"status": "passed", "category": None, "owned": None, "observations": observations}
+    except psutil.AccessDenied as exc:
+        return {
+            "status": "failed",
+            "category": "access_denied",
+            "owned": False,
+            "observations": {"pid": pid, "psutil": True, "error": str(exc)},
+        }
+    except psutil.NoSuchProcess:
+        return {"status": "passed", "category": "missing", "owned": False, "observations": {"pid": pid, "psutil": True}}
 
 
 def _psutil_extra(pid: int) -> dict[str, Any]:
