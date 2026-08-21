@@ -33,6 +33,16 @@ def pid_alive(pid: int) -> bool:
     if pid <= 0:
         return False
     try:
+        import psutil
+
+        return psutil.Process(pid).is_running() and psutil.Process(pid).status() != psutil.STATUS_ZOMBIE
+    except ImportError:
+        pass
+    except Exception:
+        return False
+    if os.name == "nt":
+        return False
+    try:
         os.kill(pid, 0)
     except ProcessLookupError:
         return False

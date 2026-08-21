@@ -85,17 +85,25 @@ def start_service(
     port_file = install / "service.port"
     if port_file.exists():
         port_file.unlink()
+    worker_script = Path(__file__).with_name("service_worker.py")
+    log_path = install / "service.worker.log"
+    env = os.environ.copy()
     worker = [
         sys.executable,
-        "-m",
-        "candidate_core.service_worker",
+        "-u",
+        str(worker_script),
         "--bind",
         bind,
         "--port-file",
         str(port_file),
     ]
-    proc = subprocess.Popen(worker, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    port = _wait_for_port_file(port_file)
+    with log_path.open("w", encoding="utf-8") as log:
+        proc = subprocess.Popen(worker, stdout=log, stderr=log, env=env)
+    try:
+        port = _wait_for_port_file(port_file, timeout=15.0)
+    except Exception:
+        proc.kill()
+        raise
     receipt = {
         "pid": proc.pid,
         "port": port,
@@ -170,7 +178,7 @@ def stop_service(prefix: Path, *, run_id: str) -> dict[str, Any]:
     return {"status": "passed", "idempotent": False, "state": "stopped"}
 
 
-def _wait_for_port_file(path: Path, timeout: float = 5.0) -> int:
+def _wait_for_port_file(path: Path, timeout: float = 15.0) -> int:
     deadline = time.time() + timeout
     while time.time() < deadline:
         if path.is_file() and path.read_text(encoding="utf-8").strip():

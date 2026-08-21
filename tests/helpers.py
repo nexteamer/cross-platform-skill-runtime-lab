@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 import zipfile
 from pathlib import Path
@@ -31,17 +32,21 @@ def write_fake_python(
         "capabilities": caps,
     }
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        dedent(
-            f"""\
-            #!{sys.executable}
-            import json
-            import sys
-            sys.stdout.write(json.dumps({payload!r}) + "\\n")
-            """
-        ),
-        encoding="utf-8",
+    body = dedent(
+        f"""\
+        #!{sys.executable}
+        import json
+        import sys
+        sys.stdout.write(json.dumps({payload!r}) + "\\n")
+        """
     )
+    if os.name == "nt":
+        script = path.parent / f"{path.name}.py"
+        script.write_text(body, encoding="utf-8")
+        launcher = path.parent / f"{path.name}.cmd"
+        launcher.write_text(f'@echo off\r\n"{sys.executable}" "{script}" %*\r\n', encoding="utf-8")
+        return launcher
+    path.write_text(body, encoding="utf-8")
     path.chmod(0o755)
     return path
 

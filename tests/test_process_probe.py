@@ -51,10 +51,10 @@ def test_foreign_listener_is_reported_and_left_running(tmp_path: Path) -> None:
     )
     result = preflight(prefix)
     assert result["category"] == "foreign_owner"
-    still = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    still.settimeout(0.2)
-    still.connect(("127.0.0.1", port))
-    still.close()
+    from candidate_core.service import listener_owner
+
+    still = listener_owner("127.0.0.1", port)
+    assert still["occupied"] is True
     sock.close()
     spike = json.loads((Path(__file__).resolve().parents[1] / "docs/spikes/psutil.json").read_text())
     assert spike["status"] == "adopted"
