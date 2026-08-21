@@ -30,15 +30,14 @@ def service_receipt_path(prefix: Path) -> Path:
 
 def listener_owner(bind: str, port: int) -> dict[str, Any]:
     probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    probe.settimeout(0.2)
     try:
-        probe.connect((bind, port))
-        connected = True
+        probe.bind((bind, port))
+        occupied = False
     except OSError:
-        connected = False
+        occupied = True
     finally:
         probe.close()
-    return {"bind": bind, "port": port, "occupied": connected}
+    return {"bind": bind, "port": port, "occupied": occupied}
 
 
 def preflight(prefix: Path, bind: str = "127.0.0.1") -> dict[str, Any]:
@@ -97,13 +96,26 @@ def start_service(
         "--port-file",
         str(port_file),
     ]
-    with log_path.open("w", encoding="utf-8") as log:
-        proc = subprocess.Popen(worker, stdout=log, stderr=log, env=env)
+    log = log_path.open("w", encoding="utf-8")
+    try:
+        proc = subprocess.Popen(
+            worker,
+            stdout=log,
+            stderr=log,
+            env=env,
+            cwd=str(install),
+        )
+    finally:
+        log.close()
     try:
         port = _wait_for_port_file(port_file, timeout=15.0)
-    except Exception:
+    except Exception as exc:
         proc.kill()
-        raise
+        detail = log_path.read_text(encoding="utf-8") if log_path.exists() else str(exc)
+        raise ServiceError(
+            f"service did not publish a port: {detail[-2000:]}",
+            category="service_start_timeout",
+        ) from exc
     receipt = {
         "pid": proc.pid,
         "port": port,

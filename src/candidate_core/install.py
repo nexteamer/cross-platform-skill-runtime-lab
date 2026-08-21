@@ -147,17 +147,11 @@ def _selected_wheel(payload_root: Path) -> dict[str, str]:
 
 
 def _rewrite_pyvenv(venv_dir: Path) -> None:
-    cfg = venv_dir / "pyvenv.cfg"
-    if not cfg.is_file():
-        return
-    lines = []
-    home = str(venv_dir)
-    for line in cfg.read_text(encoding="utf-8").splitlines():
-        if line.startswith("home ="):
-            lines.append(f"home = {home}")
-        else:
-            lines.append(line)
-    cfg.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # `home` is the base interpreter, not the venv. Rewriting it to the venv
+    # directory makes Windows launchers look for venv\\python.exe.
+    python = venv_python(venv_dir)
+    if not python.is_file():
+        raise InstallError("install_venv_python_missing", f"missing {python}")
 
 
 def _smoke(final_dir: Path) -> dict[str, Any]:

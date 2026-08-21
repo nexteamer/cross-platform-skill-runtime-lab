@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -31,7 +32,10 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     server = ThreadingHTTPServer((args.bind, 0), HealthHandler)
     port = server.server_address[1]
-    Path(args.port_file).write_text(str(port) + "\n", encoding="utf-8")
+    port_path = Path(args.port_file)
+    port_path.write_text(str(port) + "\n", encoding="utf-8")
+    sys.stderr.write(f"listening {args.bind}:{port}\n")
+    sys.stderr.flush()
     server.serve_forever()
     return 0
 

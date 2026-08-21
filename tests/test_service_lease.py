@@ -73,11 +73,15 @@ def test_permission_is_not_reported_as_busy(tmp_path: Path) -> None:
     install.mkdir(parents=True)
     lock = lock_path(prefix)
     write_json(lock, {"pid": 1, "run_id": "x", "prefix": str(prefix), "owner": "x"})
+    if os.name == "nt":
+        # chmod 0 still leaves the file readable for the owner on Windows.
+        inspection = inspect_lock(lock)
+        assert inspection["category"] != "busy"
+        return
     os.chmod(lock, 0)
     try:
         inspection = inspect_lock(lock)
         assert inspection["category"] == "permission"
-        assert inspection["category"] != "busy"
         lease = run_productctl("--json", "lease", "status", "--prefix", str(prefix))
         envelope = _envelope(lease)
         assert envelope["error"]["category"] == "permission"
