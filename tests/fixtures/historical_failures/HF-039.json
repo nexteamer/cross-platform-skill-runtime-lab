@@ -1,0 +1,15 @@
+{
+  "id": "HF-039",
+  "kind": "historical-failure-fixture",
+  "title": "unsafe cleanup guesses by prefix or glob",
+  "command": "productctl cleanup exact",
+  "stage": "cleanup.ownership",
+  "expected_error_category": "cleanup_unowned_path",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

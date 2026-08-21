@@ -1,0 +1,15 @@
+{
+  "id": "HF-022",
+  "kind": "historical-failure-fixture",
+  "title": "child startup/transport has no persistent receipt",
+  "command": "productctl codex probe",
+  "stage": "codex.child_receipt",
+  "expected_error_category": "process_receipt_missing",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

@@ -1,0 +1,15 @@
+{
+  "id": "HF-016",
+  "kind": "historical-failure-fixture",
+  "title": "another subsystem reimplements the same bad fsync",
+  "command": "productctl acceptance core",
+  "stage": "conformance.filesystem_sync",
+  "expected_error_category": "filesystem_sync_reimplemented",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

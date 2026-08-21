@@ -1,0 +1,15 @@
+{
+  "id": "HF-023",
+  "kind": "historical-failure-fixture",
+  "title": "old or foreign process owns port 3130",
+  "command": "productctl service preflight",
+  "stage": "service.listener_ownership",
+  "expected_error_category": "service_foreign_listener",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

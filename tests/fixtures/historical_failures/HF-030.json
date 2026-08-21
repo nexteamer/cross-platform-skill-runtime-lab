@@ -1,0 +1,14 @@
+{
+  "id": "HF-030",
+  "kind": "historical-failure-fixture",
+  "title": "installed dispatcher lacks executable bit",
+  "command": "productctl payload verify",
+  "stage": "install.executable_bit",
+  "expected_error_category": "payload_not_executable",
+  "platforms": [
+    "macos-arm64",
+    "linux-x86_64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

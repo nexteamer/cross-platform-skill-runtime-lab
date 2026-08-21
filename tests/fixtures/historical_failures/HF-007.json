@@ -1,0 +1,15 @@
+{
+  "id": "HF-007",
+  "kind": "historical-failure-fixture",
+  "title": "fallback archive executable path guessed incorrectly",
+  "command": "productctl payload verify",
+  "stage": "payload.archive_layout",
+  "expected_error_category": "payload_archive_path_invalid",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "candidate-core"
+version = "0.1.0"
+description = "Pre-1.0 candidate control atoms for Skill-backed local applications"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "jsonschema==4.19.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+]
+
+[project.scripts]
+productctl = "candidate_core.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+candidate_core = ["schemas/*.json", "data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

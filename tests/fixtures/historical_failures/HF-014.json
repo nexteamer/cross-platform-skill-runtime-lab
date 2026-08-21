@@ -1,0 +1,13 @@
+{
+  "id": "HF-014",
+  "kind": "historical-failure-fixture",
+  "title": "Windows file fsync uses invalid access mode",
+  "command": "productctl install",
+  "stage": "filesystem.file_sync",
+  "expected_error_category": "filesystem_sync_access_mode",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

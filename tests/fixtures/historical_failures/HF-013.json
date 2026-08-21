@@ -1,0 +1,13 @@
+{
+  "id": "HF-013",
+  "kind": "historical-failure-fixture",
+  "title": "PowerShell/.NET API unavailable on PS5.1",
+  "command": "productctl runtime discover",
+  "stage": "runtime.platform_probe",
+  "expected_error_category": "platform_probe_api_missing",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

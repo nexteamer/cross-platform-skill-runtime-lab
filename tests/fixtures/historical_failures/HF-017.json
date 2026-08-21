@@ -1,0 +1,15 @@
+{
+  "id": "HF-017",
+  "kind": "historical-failure-fixture",
+  "title": "parent and child resolve different data roots",
+  "command": "productctl doctor",
+  "stage": "paths.child_inheritance",
+  "expected_error_category": "data_root_split",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

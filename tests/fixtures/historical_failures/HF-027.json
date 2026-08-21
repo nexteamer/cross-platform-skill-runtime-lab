@@ -1,0 +1,13 @@
+{
+  "id": "HF-027",
+  "kind": "historical-failure-fixture",
+  "title": "provider/model transport times out while another path succeeds",
+  "command": "productctl codex probe",
+  "stage": "codex.transport",
+  "expected_error_category": "codex_transport_timeout",
+  "platforms": [
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

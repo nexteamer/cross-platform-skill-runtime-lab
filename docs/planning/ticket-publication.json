@@ -1,0 +1,288 @@
+[
+  {
+    "id": 1,
+    "title": "Product Contract to Control Envelope Walking Skeleton",
+    "blockers": [],
+    "what": "Make a confirmed Product Contract travel through the single acceptance seam and produce a minimal versioned Control Envelope without mutating the machine when the contract is invalid.",
+    "criteria": [
+      "A valid minimal contract produces a run identity, stage tree, terminal status, observations, and evidence references through the acceptance seam.",
+      "An invalid or incomplete contract fails before installation, process launch, or filesystem mutation.",
+      "The initial Historical Failure Registry maps every known High or Extreme row to an owner and proof lane."
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Runtime Discovery and Payload Verification Slice",
+    "blockers": [1],
+    "what": "Extend acceptance from the confirmed contract through runtime capability discovery and target-specific payload verification with explicit selection and rejection evidence.",
+    "criteria": [
+      "Python 3.11 and 3.12 candidates are judged by required capabilities rather than the presence of base pip.",
+      "Target operating-system markers, native wheel compatibility, hashes, and archive members are verified before install.",
+      "All rejected runtime and payload candidates return stable structured reasons."
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Transactional Install and Platform Path Slice",
+    "blockers": [2],
+    "what": "Install the minimal product through staging, promotion, final-path smoke, rollback, and idempotent reinstall while proving one inherited data-root contract.",
+    "criteria": [
+      "A successful install launches only from the final location and retains a durable installation receipt.",
+      "Injected staging or promotion failure rolls back without claiming a completed install.",
+      "The platformdirs Component Spike records adopted or rejected evidence without weakening explicit Product Adapter overrides or child inheritance."
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Service Lease and Lock Ownership Slice",
+    "blockers": [3],
+    "what": "Let an installed product start, report, stop, and release a loopback service only when ownership is proved, with distinct busy, permission, stale, and foreign-owner outcomes.",
+    "criteria": [
+      "Service and lease operations are idempotent and never take over an unproved owner.",
+      "Contention, crash, permission, stale-owner, and exact-path fixtures preserve fail-closed behavior.",
+      "The portalocker and filelock bake-off selects at most one candidate or retains the proven lock atom with a decision receipt."
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Process and Listener Ownership Slice",
+    "blockers": [4],
+    "what": "Expose deterministic process and listener identity evidence for service preflight, including child trees, executable identity, PID reuse, and access-denied behavior.",
+    "criteria": [
+      "A foreign listener is reported without stopping or reclassifying it as the current product.",
+      "PID reuse and access-denied fixtures fail closed while preserving useful observations.",
+      "The psutil Component Spike records adopted or rejected evidence against the same external behavior."
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Network and Codex Probe Slice",
+    "blockers": [5],
+    "what": "Resolve and probe a contract-faithful fake Codex process while returning separate network and transport stages that can later be replaced by Real Lab evidence.",
+    "criteria": [
+      "Codex candidate identity, requested and resolved model or transport, launch outcome, stdout, stderr, and exit category are recorded separately.",
+      "Network failures distinguish route, DNS, proxy, TLS, certificate-revocation, and target-HTTP stages.",
+      "No CI fixture requires a real Codex login or secret."
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Short-essay Happy-path Product Slice",
+    "blockers": [3, 4, 6],
+    "what": "Let a user submit short text through the minimal Flask page or API and receive one complete analysis, polish, and synthesis result with persisted state and artifacts.",
+    "criteria": [
+      "The user-visible page and API drive the same workflow and terminal result.",
+      "Run, stage, and structured error state survives process boundaries in SQLite.",
+      "Input, analysis, polish, synthesis, manifest, and receipts form one inspectable Run Artifact Set."
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Concurrent Polish and Partial Success Slice",
+    "blockers": [7],
+    "what": "Run two polish candidates concurrently and make synthesis obey explicit full-success, partial-success, and total-failure semantics.",
+    "criteria": [
+      "Fixtures cover zero through four concurrent branches, cancellation, and timeout.",
+      "One failed candidate yields partial_success with visible failure evidence and a result from the survivor.",
+      "Two failed candidates fail the run, and Codex failures are never silently retried."
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Artifact Diagnostics and Exact Cleanup Slice",
+    "blockers": [5, 8],
+    "what": "Make every run independently inventoryable, diagnosable, and cleanable without losing failure evidence or affecting resources owned by another run.",
+    "criteria": [
+      "Artifact names remain unique for duplicate human titles and manifests detect missing, changed, or moved outputs.",
+      "One sanitized diagnostic bundle identifies the first failed stage without publishing credentials or raw sensitive Codex internals.",
+      "Exact cleanup accepts only proved run ownership and negative fixtures leave unrelated processes and files unchanged."
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Secure Hosted CI Matrix",
+    "blockers": [2, 3, 4, 5, 6, 7, 8, 9],
+    "what": "Run the acceptance seam and Historical Failure Registry on the promised three operating systems and two Python versions through least-privilege public GitHub Actions.",
+    "criteria": [
+      "Fast pull-request and push checks and a manual full matrix cover Ubuntu 24.04, Windows Server 2022, and macOS 15 arm64 with Python 3.11 and 3.12.",
+      "Actions use read-only ordinary permissions, no product secrets, full commit SHA pins, bounded timeouts, superseded-run cancellation, and no expensive schedule.",
+      "Success receipts and seven-day failure bundles are sanitized and remain distinct from Real Lab or Desktop proof."
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Reproducible Candidate Core Release Candidate",
+    "blockers": [10],
+    "what": "Produce a reproducible pre-1.0 Candidate Core package candidate that a second product could identify and verify without claiming that Real Lab acceptance has passed.",
+    "criteria": [
+      "The package candidate includes an immutable version, manifest, SHA-256 checksum, exact dependency identities, and third-party notices.",
+      "A clean consumer verifies and exercises the package through the same Conformance Suite.",
+      "Release evidence clearly states that Hosted CI is not Real Lab or Desktop acceptance."
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Phase 1 Windows Real Lab Canary",
+    "blockers": [11],
+    "what": "Prove the short-essay product and Candidate Core against the actual Windows x64 Lab, installed runtime, real Codex environment, diagnostics, and cleanup boundary.",
+    "criteria": [
+      "Install, doctor, real Codex short-essay E2E, artifacts, and diagnostics pass or return one evidence-backed blocker.",
+      "Ordinary failures preserve the evidence-bearing state rather than triggering automatic rollback.",
+      "Platform completion restores the exact recorded baseline and repeats acceptance once."
+    ]
+  },
+  {
+    "id": 13,
+    "title": "Phase 1 macOS Real Lab Canary",
+    "blockers": [11],
+    "what": "Prove the short-essay product and Candidate Core against the actual Apple Silicon macOS Lab with the same contract and evidence boundary as Windows.",
+    "criteria": [
+      "Install, doctor, real Codex short-essay E2E, artifacts, and diagnostics pass or return one evidence-backed blocker.",
+      "Model, transport, child environment presence, service lifecycle, and executable permission are observable without silent fallback.",
+      "Platform completion restores the exact recorded baseline and repeats acceptance once."
+    ]
+  },
+  {
+    "id": 14,
+    "title": "Phase 1 Gate and Immutable Candidate Core Release",
+    "blockers": [12, 13],
+    "what": "Name the authoritative Phase 1 evidence, publish the immutable Candidate Core release, and state exactly which later Desktop claims remain unproven.",
+    "criteria": [
+      "Both Real Lab canaries and their repeated clean-baseline runs are linked to one gate verdict.",
+      "The immutable release artifacts match the tested package identity and checksums.",
+      "The verdict does not upgrade CLI or Lab evidence into Desktop E2E."
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Sanitized Public Image Export and Phase 2 Repository Gate",
+    "blockers": [14],
+    "what": "Create a new-history sanitized export from the approved immutable Public Image revision and create the second public repository only after the export is proven safe.",
+    "criteria": [
+      "Every exported source item is classified and hashed against an allowlist and denylist.",
+      "Protected Prompt Assets, repository history, agent instructions, prior workflows, operational evidence, generated artifacts, and local state are absent.",
+      "Any unclassified item or secret or prompt scan result blocks creation of the second public remote."
+    ]
+  },
+  {
+    "id": 16,
+    "title": "Public Image Contract Install and Service Slice",
+    "blockers": [15],
+    "what": "Make the sanitized Public Image product consume the immutable Candidate Core through its own confirmed Product Contract and Product Adapter.",
+    "criteria": [
+      "The second product verifies the Candidate Core identity and checksum instead of copying Core implementation.",
+      "Install, port 3130 ownership preflight, service lifecycle, doctor, diagnostics, and exact cleanup use the shared Control Envelope.",
+      "No product-specific fork of a Candidate Core atom is introduced."
+    ]
+  },
+  {
+    "id": 17,
+    "title": "Synthetic XML to Image Workflow Slice",
+    "blockers": [16],
+    "what": "Run the sanitized Public Image product from non-sensitive content through minimal XML to one simple generated image while retaining the required stage contract.",
+    "criteria": [
+      "Synthetic Prompt Fixtures preserve required roles, slots, and parseable result shapes without protected business methodology.",
+      "The workflow produces one verified image and a complete Run Artifact Set.",
+      "Timeout, terminal state, failure evidence, and cleanup obey the same Candidate Core semantics as Phase 1."
+    ]
+  },
+  {
+    "id": 18,
+    "title": "Phase 2 Windows Conformance and Real Lab Canary",
+    "blockers": [17],
+    "what": "Prove the Public Image Product Adapter and simplified workflow against the actual Windows x64 Lab using the same Candidate Core revision as Phase 1.",
+    "criteria": [
+      "The shared Conformance Suite passes without a product-specific Core fork.",
+      "Real install, port ownership, doctor, simplified image generation, artifacts, diagnostics, cleanup, and clean-baseline repeat pass or return one evidence-backed blocker.",
+      "Requested and resolved Codex identity is explicit and no fallback is silent."
+    ]
+  },
+  {
+    "id": 19,
+    "title": "Phase 2 macOS Conformance and Real Lab Canary",
+    "blockers": [17],
+    "what": "Prove the Public Image Product Adapter and simplified workflow against the actual Apple Silicon macOS Lab using the same Candidate Core revision as Phase 1.",
+    "criteria": [
+      "The shared Conformance Suite passes without a product-specific Core fork.",
+      "Real install, supported service lifecycle, doctor, simplified image generation, artifacts, diagnostics, cleanup, and clean-baseline repeat pass or return one evidence-backed blocker.",
+      "Desktop sandbox and executable identity observations remain distinct from product-side failures."
+    ]
+  },
+  {
+    "id": 20,
+    "title": "Two-product Candidate Core Gate",
+    "blockers": [18, 19],
+    "what": "Establish that one immutable Candidate Core revision has the same control semantics across both products and both real target platforms.",
+    "criteria": [
+      "Both Product Adapters pass their Conformance Suites and Real Lab gates against one Candidate Core identity.",
+      "Any shared change has a migration note and re-proves both adapters in the same gate.",
+      "The gate claims only a candidate method for the promised user-space Skill-backed application scope."
+    ]
+  },
+  {
+    "id": 21,
+    "title": "Adapter Scaffolding Skill Slice",
+    "blockers": [20],
+    "what": "Generate only Product Adapter, conformance-test, Hosted CI, and thin-Skill surfaces from a confirmed Product Contract while reusing the immutable Candidate Core.",
+    "criteria": [
+      "Repository inspection produces a draft but generation stops until safety, success, ownership, cleanup, and secret semantics are confirmed.",
+      "Generated output never regenerates process, lock, runtime, install, ownership, receipt, or cleanup atoms.",
+      "An ephemeral third dummy contract passes schema, static, and conformance checks without creating a third product repository."
+    ]
+  },
+  {
+    "id": 22,
+    "title": "Windows Codex Desktop E2E",
+    "blockers": [20],
+    "what": "Use a new Windows Codex Desktop task to prove GitHub installation, runtime setup, restart usability, real simplified image generation, and visible artifact inspection.",
+    "criteria": [
+      "The attempt ledger groups failures by category and permits at most five attempts for the same unresolved category; a sixth attempt is prohibited.",
+      "A passing verdict requires the actual Desktop task and user-visible artifact flow, not shell, Lab, sample, or screenshot substitution.",
+      "If the fifth same-category attempt remains unresolved, stop the Windows Desktop branch, preserve evidence, and make the downstream Windows recording ticket skipped by policy."
+    ]
+  },
+  {
+    "id": 23,
+    "title": "macOS Codex Desktop E2E",
+    "blockers": [20],
+    "what": "Use a new macOS Codex Desktop task to prove GitHub installation, runtime setup, restart usability, real simplified image generation, and visible artifact inspection.",
+    "criteria": [
+      "The attempt ledger groups failures by category and permits at most five attempts for the same unresolved category; a sixth attempt is prohibited.",
+      "A passing verdict requires the actual Desktop task and user-visible artifact flow, not shell, Lab, sample, or screenshot substitution.",
+      "If the fifth same-category attempt remains unresolved, stop the macOS Desktop branch, preserve evidence, and make the downstream macOS recording ticket skipped by policy."
+    ]
+  },
+  {
+    "id": 24,
+    "title": "Windows Recording Proof",
+    "blockers": [22],
+    "what": "After Windows Desktop E2E passes, produce a validated Windows recording while keeping product and recording verdicts independent.",
+    "criteria": [
+      "If Windows Desktop E2E is terminally blocked after five same-category attempts, this ticket is skipped without a recording attempt.",
+      "When eligible, a real shakedown precedes formal recording and the output is checked for file presence, duration, frames, and readback.",
+      "The same unresolved recording failure category receives at most five attempts; after the fifth failure the Windows branch stops with retained evidence and no sixth attempt."
+    ]
+  },
+  {
+    "id": 25,
+    "title": "macOS Recording Proof",
+    "blockers": [23],
+    "what": "After macOS Desktop E2E passes, produce a validated macOS recording while keeping product and recording verdicts independent.",
+    "criteria": [
+      "If macOS Desktop E2E is terminally blocked after five same-category attempts, this ticket is skipped without a recording attempt.",
+      "When eligible, a real shakedown precedes formal recording and the output is checked for file presence, duration, frames, and readback.",
+      "The same unresolved recording failure category receives at most five attempts; after the fifth failure the macOS branch stops with retained evidence and no sixth attempt."
+    ]
+  },
+  {
+    "id": 26,
+    "title": "Final Bounded Verdict and Exact Cleanup",
+    "blockers": [21, 22, 23, 24, 25],
+    "what": "Name the final evidence authority, report each Desktop and recording branch as PASS, BLOCKED, or SKIPPED, restore exact platform baselines, and perform only ownership-bounded cleanup.",
+    "criteria": [
+      "A policy skip or blocked terminal ticket is reported as such and never converted into inferred success.",
+      "The same unresolved finalization or cleanup failure category receives at most five attempts; the fifth unresolved attempt stops work and preserves evidence with no sixth attempt.",
+      "The final claim remains limited to the platforms and proof lanes that actually passed, and exact cleanup leaves unrelated state unchanged."
+    ]
+  }
+]

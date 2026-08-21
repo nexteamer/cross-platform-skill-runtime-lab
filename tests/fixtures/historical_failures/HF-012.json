@@ -1,0 +1,15 @@
+{
+  "id": "HF-012",
+  "kind": "historical-failure-fixture",
+  "title": "diagnostic receipt deleted with temporary staging",
+  "command": "productctl diagnostics collect",
+  "stage": "install.evidence_lifetime",
+  "expected_error_category": "evidence_deleted_with_staging",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

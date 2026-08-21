@@ -1,0 +1,13 @@
+{
+  "id": "HF-029",
+  "kind": "historical-failure-fixture",
+  "title": "trusted executable path rejects active Mac Desktop executable",
+  "command": "productctl codex resolve",
+  "stage": "codex.identity.path",
+  "expected_error_category": "codex_trusted_path_reject",
+  "platforms": [
+    "macos-arm64"
+  ],
+  "proof_lane": "real-macos-lab",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

@@ -1,0 +1,13 @@
+{
+  "id": "HF-021",
+  "kind": "historical-failure-fixture",
+  "title": "multiple valid Codex cache generations",
+  "command": "productctl codex resolve",
+  "stage": "codex.identity.generation",
+  "expected_error_category": "codex_generation_ambiguous",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "real-windows-lab",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

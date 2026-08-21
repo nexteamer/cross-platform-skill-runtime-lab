@@ -1,0 +1,13 @@
+{
+  "id": "HF-010",
+  "kind": "historical-failure-fixture",
+  "title": "embedded Python `-c` quoting corrupted",
+  "command": "productctl process probe",
+  "stage": "process.argument_policy",
+  "expected_error_category": "process_shell_quoting",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

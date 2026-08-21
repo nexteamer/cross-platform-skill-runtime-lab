@@ -1,0 +1,15 @@
+{
+  "id": "HF-031",
+  "kind": "historical-failure-fixture",
+  "title": "client/server deadline mismatch leaves DB state `running`",
+  "command": "productctl workflow run",
+  "stage": "workflow.timeout",
+  "expected_error_category": "workflow_timeout_state_leak",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

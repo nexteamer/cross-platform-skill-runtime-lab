@@ -1,0 +1,13 @@
+{
+  "id": "HF-020",
+  "kind": "historical-failure-fixture",
+  "title": "quoted/unquoted Authenticode Publisher mismatch",
+  "command": "productctl codex resolve",
+  "stage": "codex.identity.publisher",
+  "expected_error_category": "codex_publisher_string_mismatch",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

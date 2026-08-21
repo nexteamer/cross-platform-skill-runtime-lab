@@ -1,0 +1,15 @@
+{
+  "id": "HF-036",
+  "kind": "historical-failure-fixture",
+  "title": "historical artifact cannot later be located or attributed",
+  "command": "productctl artifacts inventory",
+  "stage": "artifacts.attribution",
+  "expected_error_category": "artifact_unattributed",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

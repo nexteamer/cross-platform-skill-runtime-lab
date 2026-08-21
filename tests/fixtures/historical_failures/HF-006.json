@@ -1,0 +1,15 @@
+{
+  "id": "HF-006",
+  "kind": "historical-failure-fixture",
+  "title": "usable Python rejected because base `pip` is absent",
+  "command": "productctl runtime discover",
+  "stage": "runtime.capability",
+  "expected_error_category": "runtime_capability_false_negative",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

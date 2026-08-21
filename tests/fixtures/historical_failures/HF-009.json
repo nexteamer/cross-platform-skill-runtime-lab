@@ -1,0 +1,13 @@
+{
+  "id": "HF-009",
+  "kind": "historical-failure-fixture",
+  "title": "empty native argument dropped",
+  "command": "productctl process probe",
+  "stage": "process.argv",
+  "expected_error_category": "process_empty_argument_dropped",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

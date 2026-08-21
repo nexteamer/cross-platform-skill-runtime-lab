@@ -1,0 +1,13 @@
+{
+  "id": "HF-033",
+  "kind": "historical-failure-fixture",
+  "title": "permission error is flattened into `busy`",
+  "command": "productctl lease status",
+  "stage": "lease.permission",
+  "expected_error_category": "lease_permission_misclassified_busy",
+  "platforms": [
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

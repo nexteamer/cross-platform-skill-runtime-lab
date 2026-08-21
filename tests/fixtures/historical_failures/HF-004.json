@@ -1,0 +1,15 @@
+{
+  "id": "HF-004",
+  "kind": "historical-failure-fixture",
+  "title": "CP311/CP312 native wheels absent",
+  "command": "productctl payload verify",
+  "stage": "payload.wheel_abi",
+  "expected_error_category": "payload_wheel_missing",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

@@ -1,0 +1,15 @@
+{
+  "id": "HF-024",
+  "kind": "historical-failure-fixture",
+  "title": "route/DNS/proxy are green but TLS/CRL/SOCKS semantics fail",
+  "command": "productctl network probe",
+  "stage": "network.tls",
+  "expected_error_category": "network_tls_or_crl_failed",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

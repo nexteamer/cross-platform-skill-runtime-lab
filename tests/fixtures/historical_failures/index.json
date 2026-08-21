@@ -1,0 +1,666 @@
+{
+  "registry_version": "0.1.0",
+  "source": "docs/planning/historical-failure-command-coverage.md",
+  "entries": [
+    {
+      "id": "HF-001",
+      "title": "Hyper-V vTPM / Key Protector mismatch",
+      "severity": "high",
+      "owner_layer": "windows-lab",
+      "product_owned": false,
+      "command": null,
+      "external_entrypoint": "labctl restore-and-verify",
+      "stage": "lab.restore",
+      "expected_error_category": "lab_identity_mismatch",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": null,
+      "proof_lane": "real-windows-lab"
+    },
+    {
+      "id": "HF-002",
+      "title": "VM identity, checkpoint, network, SSH, proxy, capacity preflight",
+      "severity": "extreme",
+      "owner_layer": "lab",
+      "product_owned": false,
+      "command": null,
+      "external_entrypoint": "labctl verify",
+      "stage": "lab.preflight",
+      "expected_error_category": "lab_preflight_failed",
+      "platforms": [
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": null,
+      "proof_lane": "real-lab"
+    },
+    {
+      "id": "HF-003",
+      "title": "SSH connect succeeds but command/output stalls",
+      "severity": "high",
+      "owner_layer": "windows-lab-transport",
+      "product_owned": false,
+      "command": null,
+      "external_entrypoint": "labctl ssh-transaction",
+      "stage": "lab.ssh.output",
+      "expected_error_category": "lab_ssh_stalled",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": null,
+      "proof_lane": "real-windows-lab"
+    },
+    {
+      "id": "HF-004",
+      "title": "CP311/CP312 native wheels absent",
+      "severity": "high",
+      "owner_layer": "product-payload",
+      "product_owned": true,
+      "command": "payload verify",
+      "external_entrypoint": null,
+      "stage": "payload.wheel_abi",
+      "expected_error_category": "payload_wheel_missing",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-004.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-005",
+      "title": "Windows-only environment marker omitted",
+      "severity": "medium",
+      "owner_layer": "product-payload",
+      "product_owned": true,
+      "command": "payload verify",
+      "external_entrypoint": null,
+      "stage": "payload.environment_marker",
+      "expected_error_category": "payload_marker_missing",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-005.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-006",
+      "title": "usable Python rejected because base `pip` is absent",
+      "severity": "high",
+      "owner_layer": "candidate-core-runtime",
+      "product_owned": true,
+      "command": "runtime discover",
+      "external_entrypoint": null,
+      "stage": "runtime.capability",
+      "expected_error_category": "runtime_capability_false_negative",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-006.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-007",
+      "title": "fallback archive executable path guessed incorrectly",
+      "severity": "high",
+      "owner_layer": "product-payload-runtime",
+      "product_owned": true,
+      "command": "payload verify",
+      "external_entrypoint": null,
+      "stage": "payload.archive_layout",
+      "expected_error_category": "payload_archive_path_invalid",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-007.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-008",
+      "title": "native stderr treated as process failure or truncated",
+      "severity": "extreme",
+      "owner_layer": "candidate-core-process",
+      "product_owned": true,
+      "command": "process probe",
+      "external_entrypoint": null,
+      "stage": "process.stderr",
+      "expected_error_category": "process_stderr_misclassified",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-008.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-009",
+      "title": "empty native argument dropped",
+      "severity": "high",
+      "owner_layer": "candidate-core-process",
+      "product_owned": true,
+      "command": "process probe",
+      "external_entrypoint": null,
+      "stage": "process.argv",
+      "expected_error_category": "process_empty_argument_dropped",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-009.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-010",
+      "title": "embedded Python `-c` quoting corrupted",
+      "severity": "high",
+      "owner_layer": "candidate-core-process",
+      "product_owned": true,
+      "command": "process probe",
+      "external_entrypoint": null,
+      "stage": "process.argument_policy",
+      "expected_error_category": "process_shell_quoting",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-010.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-011",
+      "title": "UTF-8 JSON written with BOM",
+      "severity": "high",
+      "owner_layer": "candidate-core-receipt",
+      "product_owned": true,
+      "command": "acceptance core",
+      "external_entrypoint": null,
+      "stage": "receipt.encoding",
+      "expected_error_category": "receipt_utf8_bom",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-011.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-012",
+      "title": "diagnostic receipt deleted with temporary staging",
+      "severity": "high",
+      "owner_layer": "candidate-core-evidence",
+      "product_owned": true,
+      "command": "diagnostics collect",
+      "external_entrypoint": null,
+      "stage": "install.evidence_lifetime",
+      "expected_error_category": "evidence_deleted_with_staging",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-012.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-013",
+      "title": "PowerShell/.NET API unavailable on PS5.1",
+      "severity": "high",
+      "owner_layer": "platform-probe",
+      "product_owned": true,
+      "command": "runtime discover",
+      "external_entrypoint": null,
+      "stage": "runtime.platform_probe",
+      "expected_error_category": "platform_probe_api_missing",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-013.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-014",
+      "title": "Windows file fsync uses invalid access mode",
+      "severity": "high",
+      "owner_layer": "candidate-core-filesystem",
+      "product_owned": true,
+      "command": "install",
+      "external_entrypoint": null,
+      "stage": "filesystem.file_sync",
+      "expected_error_category": "filesystem_sync_access_mode",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-014.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-015",
+      "title": "POSIX directory fsync attempted on Windows",
+      "severity": "high",
+      "owner_layer": "candidate-core-filesystem",
+      "product_owned": true,
+      "command": "install",
+      "external_entrypoint": null,
+      "stage": "filesystem.dir_sync",
+      "expected_error_category": "filesystem_dir_sync_unsupported",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-015.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-016",
+      "title": "another subsystem reimplements the same bad fsync",
+      "severity": "high",
+      "owner_layer": "conformance-suite",
+      "product_owned": true,
+      "command": "acceptance core",
+      "external_entrypoint": null,
+      "stage": "conformance.filesystem_sync",
+      "expected_error_category": "filesystem_sync_reimplemented",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-016.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-017",
+      "title": "parent and child resolve different data roots",
+      "severity": "high",
+      "owner_layer": "candidate-core-paths",
+      "product_owned": true,
+      "command": "doctor",
+      "external_entrypoint": null,
+      "stage": "paths.child_inheritance",
+      "expected_error_category": "data_root_split",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-017.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-018",
+      "title": "promoted venv launcher still points to staging",
+      "severity": "high",
+      "owner_layer": "candidate-core-install",
+      "product_owned": true,
+      "command": "install",
+      "external_entrypoint": null,
+      "stage": "install.final_path_smoke",
+      "expected_error_category": "install_launcher_points_at_staging",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-018.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-019",
+      "title": "AppX resource and managed cache incorrectly require equal hashes",
+      "severity": "extreme",
+      "owner_layer": "product-codex-adapter",
+      "product_owned": true,
+      "command": "codex resolve",
+      "external_entrypoint": null,
+      "stage": "codex.identity.hash",
+      "expected_error_category": "codex_hash_identity_overfit",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-019.json",
+      "proof_lane": "real-windows-lab"
+    },
+    {
+      "id": "HF-020",
+      "title": "quoted/unquoted Authenticode Publisher mismatch",
+      "severity": "extreme",
+      "owner_layer": "product-codex-adapter",
+      "product_owned": true,
+      "command": "codex resolve",
+      "external_entrypoint": null,
+      "stage": "codex.identity.publisher",
+      "expected_error_category": "codex_publisher_string_mismatch",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-020.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-021",
+      "title": "multiple valid Codex cache generations",
+      "severity": "extreme",
+      "owner_layer": "product-codex-adapter",
+      "product_owned": true,
+      "command": "codex resolve",
+      "external_entrypoint": null,
+      "stage": "codex.identity.generation",
+      "expected_error_category": "codex_generation_ambiguous",
+      "platforms": [
+        "windows-x64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-021.json",
+      "proof_lane": "real-windows-lab"
+    },
+    {
+      "id": "HF-022",
+      "title": "child startup/transport has no persistent receipt",
+      "severity": "high",
+      "owner_layer": "candidate-core-process",
+      "product_owned": true,
+      "command": "codex probe",
+      "external_entrypoint": null,
+      "stage": "codex.child_receipt",
+      "expected_error_category": "process_receipt_missing",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-022.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-023",
+      "title": "old or foreign process owns port 3130",
+      "severity": "extreme",
+      "owner_layer": "product-service-adapter",
+      "product_owned": true,
+      "command": "service preflight",
+      "external_entrypoint": null,
+      "stage": "service.listener_ownership",
+      "expected_error_category": "service_foreign_listener",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-023.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-024",
+      "title": "route/DNS/proxy are green but TLS/CRL/SOCKS semantics fail",
+      "severity": "extreme",
+      "owner_layer": "product-network-adapter",
+      "product_owned": true,
+      "command": "network probe",
+      "external_entrypoint": null,
+      "stage": "network.tls",
+      "expected_error_category": "network_tls_or_crl_failed",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-024.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-025",
+      "title": "Desktop UI selector/observer/helper fails",
+      "severity": "extreme",
+      "owner_layer": "desktop-operation",
+      "product_owned": false,
+      "command": null,
+      "external_entrypoint": "desktop-bridge probe",
+      "stage": "desktop.observe",
+      "expected_error_category": "desktop_observer_failed",
+      "platforms": [
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": null,
+      "proof_lane": "desktop-e2e"
+    },
+    {
+      "id": "HF-026",
+      "title": "Mac capacity gate is too low",
+      "severity": "medium",
+      "owner_layer": "mac-lab",
+      "product_owned": false,
+      "command": null,
+      "external_entrypoint": "labctl capacity",
+      "stage": "lab.capacity",
+      "expected_error_category": "lab_capacity_too_low",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "fixture": null,
+      "proof_lane": "real-macos-lab"
+    },
+    {
+      "id": "HF-027",
+      "title": "provider/model transport times out while another path succeeds",
+      "severity": "extreme",
+      "owner_layer": "product-codex-adapter",
+      "product_owned": true,
+      "command": "codex probe",
+      "external_entrypoint": null,
+      "stage": "codex.transport",
+      "expected_error_category": "codex_transport_timeout",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-027.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-028",
+      "title": "proxy environment hypothesis is unobservable or false",
+      "severity": "high",
+      "owner_layer": "candidate-core-process",
+      "product_owned": true,
+      "command": "codex probe",
+      "external_entrypoint": null,
+      "stage": "codex.child_environment",
+      "expected_error_category": "process_env_unobservable",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-028.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-029",
+      "title": "trusted executable path rejects active Mac Desktop executable",
+      "severity": "high",
+      "owner_layer": "product-codex-adapter",
+      "product_owned": true,
+      "command": "codex resolve",
+      "external_entrypoint": null,
+      "stage": "codex.identity.path",
+      "expected_error_category": "codex_trusted_path_reject",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-029.json",
+      "proof_lane": "real-macos-lab"
+    },
+    {
+      "id": "HF-030",
+      "title": "installed dispatcher lacks executable bit",
+      "severity": "high",
+      "owner_layer": "product-payload-install",
+      "product_owned": true,
+      "command": "payload verify",
+      "external_entrypoint": null,
+      "stage": "install.executable_bit",
+      "expected_error_category": "payload_not_executable",
+      "platforms": [
+        "macos-arm64",
+        "linux-x86_64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-030.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-031",
+      "title": "client/server deadline mismatch leaves DB state `running`",
+      "severity": "extreme",
+      "owner_layer": "candidate-core-workflow",
+      "product_owned": true,
+      "command": "workflow run",
+      "external_entrypoint": null,
+      "stage": "workflow.timeout",
+      "expected_error_category": "workflow_timeout_state_leak",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-031.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-032",
+      "title": "Desktop sandbox cannot register persistent user service",
+      "severity": "high",
+      "owner_layer": "product-service-adapter",
+      "product_owned": true,
+      "command": "service preflight",
+      "external_entrypoint": null,
+      "stage": "service.lifecycle_selection",
+      "expected_error_category": "service_lifecycle_unsupported",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-032.json",
+      "proof_lane": "desktop-e2e"
+    },
+    {
+      "id": "HF-033",
+      "title": "permission error is flattened into `busy`",
+      "severity": "high",
+      "owner_layer": "candidate-core-lease",
+      "product_owned": true,
+      "command": "lease status",
+      "external_entrypoint": null,
+      "stage": "lease.permission",
+      "expected_error_category": "lease_permission_misclassified_busy",
+      "platforms": [
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-033.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-034",
+      "title": "same-title pages overwrite PNGs",
+      "severity": "medium",
+      "owner_layer": "product-artifact-adapter",
+      "product_owned": true,
+      "command": "artifacts verify",
+      "external_entrypoint": null,
+      "stage": "artifacts.unique_name",
+      "expected_error_category": "artifact_name_collision",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-034.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-035",
+      "title": "Preview dies when held service exits",
+      "severity": "high",
+      "owner_layer": "product-artifact-service",
+      "product_owned": true,
+      "command": "artifacts verify",
+      "external_entrypoint": null,
+      "stage": "artifacts.preview_lifetime",
+      "expected_error_category": "artifact_preview_depends_on_live_service",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-035.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-036",
+      "title": "historical artifact cannot later be located or attributed",
+      "severity": "high",
+      "owner_layer": "candidate-core-artifact",
+      "product_owned": true,
+      "command": "artifacts inventory",
+      "external_entrypoint": null,
+      "stage": "artifacts.attribution",
+      "expected_error_category": "artifact_unattributed",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-036.json",
+      "proof_lane": "hosted-ci"
+    },
+    {
+      "id": "HF-037",
+      "title": "recording creates no file or a 0.5-second artifact",
+      "severity": "extreme",
+      "owner_layer": "recording",
+      "product_owned": false,
+      "command": null,
+      "external_entrypoint": "recording probe",
+      "stage": "recording.shakedown",
+      "expected_error_category": "recording_invalid_artifact",
+      "platforms": [
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": null,
+      "proof_lane": "recording"
+    },
+    {
+      "id": "HF-038",
+      "title": "cloud publication/upload/readback fails",
+      "severity": "high",
+      "owner_layer": "publication",
+      "product_owned": false,
+      "command": null,
+      "external_entrypoint": "cloudflare publication workflow",
+      "stage": "publication.readback",
+      "expected_error_category": "publication_failed",
+      "platforms": [
+        "linux-x86_64"
+      ],
+      "fixture": null,
+      "proof_lane": "publication"
+    },
+    {
+      "id": "HF-039",
+      "title": "unsafe cleanup guesses by prefix or glob",
+      "severity": "high",
+      "owner_layer": "candidate-core-mutation",
+      "product_owned": true,
+      "command": "cleanup exact",
+      "external_entrypoint": null,
+      "stage": "cleanup.ownership",
+      "expected_error_category": "cleanup_unowned_path",
+      "platforms": [
+        "linux-x86_64",
+        "windows-x64",
+        "macos-arm64"
+      ],
+      "fixture": "tests/fixtures/historical_failures/HF-039.json",
+      "proof_lane": "hosted-ci"
+    }
+  ]
+}

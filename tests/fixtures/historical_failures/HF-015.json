@@ -1,0 +1,13 @@
+{
+  "id": "HF-015",
+  "kind": "historical-failure-fixture",
+  "title": "POSIX directory fsync attempted on Windows",
+  "command": "productctl install",
+  "stage": "filesystem.dir_sync",
+  "expected_error_category": "filesystem_dir_sync_unsupported",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

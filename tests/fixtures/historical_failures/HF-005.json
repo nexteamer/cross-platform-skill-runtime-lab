@@ -1,0 +1,13 @@
+{
+  "id": "HF-005",
+  "kind": "historical-failure-fixture",
+  "title": "Windows-only environment marker omitted",
+  "command": "productctl payload verify",
+  "stage": "payload.environment_marker",
+  "expected_error_category": "payload_marker_missing",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

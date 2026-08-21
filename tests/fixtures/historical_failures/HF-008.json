@@ -1,0 +1,15 @@
+{
+  "id": "HF-008",
+  "kind": "historical-failure-fixture",
+  "title": "native stderr treated as process failure or truncated",
+  "command": "productctl process probe",
+  "stage": "process.stderr",
+  "expected_error_category": "process_stderr_misclassified",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

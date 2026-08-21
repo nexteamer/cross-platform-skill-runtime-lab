@@ -1,0 +1,15 @@
+{
+  "id": "HF-035",
+  "kind": "historical-failure-fixture",
+  "title": "Preview dies when held service exits",
+  "command": "productctl artifacts verify",
+  "stage": "artifacts.preview_lifetime",
+  "expected_error_category": "artifact_preview_depends_on_live_service",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

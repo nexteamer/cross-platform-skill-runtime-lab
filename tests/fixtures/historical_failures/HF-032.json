@@ -1,0 +1,13 @@
+{
+  "id": "HF-032",
+  "kind": "historical-failure-fixture",
+  "title": "Desktop sandbox cannot register persistent user service",
+  "command": "productctl service preflight",
+  "stage": "service.lifecycle_selection",
+  "expected_error_category": "service_lifecycle_unsupported",
+  "platforms": [
+    "macos-arm64"
+  ],
+  "proof_lane": "desktop-e2e",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

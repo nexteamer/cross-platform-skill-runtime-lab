@@ -1,0 +1,13 @@
+{
+  "id": "HF-018",
+  "kind": "historical-failure-fixture",
+  "title": "promoted venv launcher still points to staging",
+  "command": "productctl install",
+  "stage": "install.final_path_smoke",
+  "expected_error_category": "install_launcher_points_at_staging",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

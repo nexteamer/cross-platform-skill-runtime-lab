@@ -1,0 +1,64 @@
+{
+  "contract_version": "0.1.0",
+  "confirmed": true,
+  "product": {
+    "id": "short-essay-lab",
+    "name": "Short-essay Compatibility Lab",
+    "entrypoint": "productctl"
+  },
+  "platforms": {
+    "operating_systems": ["linux-x86_64", "windows-x64", "macos-arm64"],
+    "python": ["3.11", "3.12"]
+  },
+  "runtime": {
+    "discovery": {
+      "required_capabilities": ["executable", "version", "venv", "ensurepip"]
+    }
+  },
+  "install": {
+    "payload": {
+      "kind": "wheelhouse",
+      "require_target_markers": true
+    }
+  },
+  "service": {
+    "bind": "127.0.0.1",
+    "port": "dynamic",
+    "health": {
+      "path": "/health"
+    }
+  },
+  "data_roots": {
+    "inherit_to_children": true,
+    "override_allowed": true
+  },
+  "codex": {
+    "resolve": {
+      "require_explicit_identity": true,
+      "silent_fallback": false
+    }
+  },
+  "workflow": {
+    "name": "short-essay",
+    "stages": ["analysis", "polish", "synthesis"],
+    "concurrency": {
+      "polish_candidates": 2
+    }
+  },
+  "artifacts": {
+    "set": ["input", "analysis", "candidates", "synthesis", "manifest", "receipts"]
+  },
+  "mutations": {
+    "ownership_required": true
+  },
+  "cleanup": {
+    "mode": "exact",
+    "require_run_id": true
+  },
+  "secrets": {
+    "never_emit": ["token", "auth_file", "protected_prompt", "credential"]
+  },
+  "acceptance": {
+    "seam": "productctl acceptance core"
+  }
+}

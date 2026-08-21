@@ -1,0 +1,13 @@
+{
+  "id": "HF-019",
+  "kind": "historical-failure-fixture",
+  "title": "AppX resource and managed cache incorrectly require equal hashes",
+  "command": "productctl codex resolve",
+  "stage": "codex.identity.hash",
+  "expected_error_category": "codex_hash_identity_overfit",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "real-windows-lab",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

@@ -1,0 +1,13 @@
+{
+  "id": "HF-011",
+  "kind": "historical-failure-fixture",
+  "title": "UTF-8 JSON written with BOM",
+  "command": "productctl acceptance core",
+  "stage": "receipt.encoding",
+  "expected_error_category": "receipt_utf8_bom",
+  "platforms": [
+    "windows-x64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}

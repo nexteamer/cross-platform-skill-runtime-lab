@@ -1,0 +1,15 @@
+{
+  "id": "HF-034",
+  "kind": "historical-failure-fixture",
+  "title": "same-title pages overwrite PNGs",
+  "command": "productctl artifacts verify",
+  "stage": "artifacts.unique_name",
+  "expected_error_category": "artifact_name_collision",
+  "platforms": [
+    "linux-x86_64",
+    "windows-x64",
+    "macos-arm64"
+  ],
+  "proof_lane": "hosted-ci",
+  "notes": "Expected structured failure for registry coverage. Executable behavior lands in the owning slice."
+}
