@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 
 from tests.conftest import run_productctl
+from tests.helpers import write_stub_codex
 
 
 def _envelope(proc) -> dict:
@@ -56,3 +58,90 @@ def test_network_probe_distinguishes_injected_layers() -> None:
     assert envelope["error"]["category"] == "network_tls_failed"
     assert envelope["observations"]["failed_stage"] == "tls"
     assert envelope["observations"]["stages"][0]["status"] == "passed"
+
+
+def test_real_codex_missing_does_not_fallback(tmp_path: Path) -> None:
+    empty = tmp_path / "empty-bin"
+    empty.mkdir()
+    proc = run_productctl(
+        "--json",
+        "codex",
+        "resolve",
+        "--model",
+        "lab-model",
+        "--transport",
+        "chatgpt",
+        env={
+            "PRODUCTCTL_ALLOW_REAL_CODEX": "1",
+            "PATH": str(empty),
+        },
+    )
+    envelope = _envelope(proc)
+    assert proc.returncode == 2, proc.stdout
+    assert envelope["error"]["category"] == "real_codex_missing"
+    assert envelope["observations"]["silent_fallback"] is False
+    assert envelope["observations"]["resolved"] is None
+
+
+def test_real_codex_requires_explicit_identity() -> None:
+    proc = run_productctl(
+        "--json",
+        "codex",
+        "resolve",
+        env={"PRODUCTCTL_ALLOW_REAL_CODEX": "1", "PATH": ""},
+    )
+    envelope = _envelope(proc)
+    assert proc.returncode == 2, proc.stdout
+    assert envelope["error"]["category"] == "codex_identity_unspecified"
+    assert envelope["observations"]["silent_fallback"] is False
+
+
+def test_real_codex_probe_uses_exec_and_last_message(tmp_path: Path) -> None:
+    bin_dir = tmp_path / "bin"
+    write_stub_codex(bin_dir, message="lab-ok")
+    proc = run_productctl(
+        "--json",
+        "codex",
+        "probe",
+        "--model",
+        "lab-model",
+        "--transport",
+        "chatgpt",
+        env={
+            "PRODUCTCTL_ALLOW_REAL_CODEX": "1",
+            "PATH": str(bin_dir),
+            "STUB_CODEX_TEXT": "lab-ok",
+        },
+    )
+    envelope = _envelope(proc)
+    assert proc.returncode == 0, proc.stdout
+    obs = envelope["observations"]
+    assert obs["resolved"]["name"] == "codex"
+    assert obs["resolved"]["model"] == "lab-model"
+    assert obs["resolved"]["transport"] == "chatgpt"
+    assert "exec" in obs["launch"]["argv"]
+    assert obs["parsed"]["text"] == "lab-ok"
+    assert obs["silent_fallback"] is False
+
+
+def test_real_codex_auth_failure_is_visible(tmp_path: Path) -> None:
+    bin_dir = tmp_path / "bin"
+    write_stub_codex(bin_dir)
+    proc = run_productctl(
+        "--json",
+        "codex",
+        "probe",
+        "--model",
+        "lab-model",
+        "--transport",
+        "chatgpt",
+        env={
+            "PRODUCTCTL_ALLOW_REAL_CODEX": "1",
+            "PATH": str(bin_dir),
+            "STUB_CODEX_FAIL": "auth",
+        },
+    )
+    envelope = _envelope(proc)
+    assert proc.returncode == 2, proc.stdout
+    assert envelope["error"]["category"] == "codex_auth_missing"
+    assert "not logged in" in envelope["observations"]["stderr"]

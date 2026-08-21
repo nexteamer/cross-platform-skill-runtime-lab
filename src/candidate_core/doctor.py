@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from candidate_core.codex import resolve_codex
+from candidate_core.codex import default_requested, resolve_codex
 from candidate_core.contract import load_and_validate_contract
 from candidate_core.jsonio import load_json
 from candidate_core.service import status_service
@@ -46,7 +46,25 @@ def run_doctor(*, contract_path: Path, prefix: Path | None = None) -> dict[str, 
             }
         )
 
-    resolved = resolve_codex()
+    resolved = resolve_codex(requested=default_requested())
+    if resolved.get("status") != "passed":
+        stages.append(
+            {
+                "id": "codex",
+                "status": "failed",
+                "category": resolved.get("category"),
+                "resolved": resolved.get("resolved"),
+                "silent_fallback": resolved.get("silent_fallback"),
+                "candidates": resolved.get("candidates"),
+            }
+        )
+        return {
+            "status": "failed",
+            "failed_stage": "codex",
+            "stages": stages,
+            "receipt": receipt,
+            "product_id": contract["product"]["id"],
+        }
     stages.append(
         {
             "id": "codex",

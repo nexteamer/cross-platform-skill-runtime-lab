@@ -160,8 +160,10 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
         result = resolve_codex(
             requested={"model": args.model, "transport": args.transport},
         )
-        ctx.add_stage(stage("codex_resolve", "passed", observations=result))
-        return build_envelope(run_id=ctx.run_id, command=ctx.command, status="passed", stages=ctx.stages, observations=result)
+        status = result.get("status") or "passed"
+        error = None if status == "passed" else error_payload(result.get("category") or "codex_resolve_failed", "codex resolve failed")
+        ctx.add_stage(stage("codex_resolve", "passed" if status == "passed" else "failed", observations=result, error=error))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status=status, stages=ctx.stages, observations=result, error=error)
     if command == "codex.probe":
         extra = ["--fail", args.fail] if getattr(args, "fail", None) else None
         result = probe_codex(
@@ -169,7 +171,7 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
             extra_args=extra,
         )
         status = result["status"]
-        error = None if status == "passed" else error_payload("codex_probe_failed", result["launch"]["exit_category"])
+        error = None if status == "passed" else error_payload(result.get("category") or "codex_probe_failed", (result.get("launch") or {}).get("exit_category") or result.get("category") or "codex_probe_failed")
         ctx.add_stage(stage("codex_probe", "passed" if status == "passed" else "failed", observations=result, error=error))
         return build_envelope(run_id=ctx.run_id, command=ctx.command, status=status, stages=ctx.stages, observations=result, error=error)
     if command == "process.probe":

@@ -108,3 +108,52 @@ def write_payload(
 
 def path_with_bin(bin_dir: Path) -> str:
     return str(bin_dir)
+
+
+def write_stub_codex(bin_dir: Path, *, message: str = "ok") -> Path:
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    body = dedent(
+        f"""\
+        import json
+        import os
+        import sys
+        from pathlib import Path
+
+        if os.environ.get("STUB_CODEX_FAIL") == "auth":
+            sys.stderr.write("ERROR: not logged in\\n")
+            raise SystemExit(1)
+        args = sys.argv[1:]
+        if not args or args[0] != "exec":
+            sys.stderr.write("expected exec\\n")
+            raise SystemExit(2)
+        last = None
+        i = 1
+        while i < len(args):
+            if args[i] == "--output-last-message":
+                last = args[i + 1]
+                i += 2
+                continue
+            if args[i] in ("--json", "--skip-git-repo-check", "--ephemeral"):
+                i += 1
+                continue
+            if args[i] in ("--color", "-s", "-m", "--cd"):
+                i += 2
+                continue
+            i += 1
+        text = os.environ.get("STUB_CODEX_TEXT", {message!r})
+        if last:
+            Path(last).write_text(text, encoding="utf-8")
+        sys.stdout.write(json.dumps({{"type": "item.completed", "item": {{"type": "agent_message", "text": text}}}}) + "\\n")
+        sys.stdout.write(json.dumps({{"type": "result", "text": text}}) + "\\n")
+        """
+    )
+    script = bin_dir / "codex.py"
+    script.write_text(body, encoding="utf-8")
+    if os.name == "nt":
+        launcher = bin_dir / "codex.cmd"
+        launcher.write_text(f'@echo off\r\n"{sys.executable}" "{script}" %*\r\n', encoding="utf-8")
+        return launcher
+    path = bin_dir / "codex"
+    path.write_text("#!" + sys.executable + "\n" + body, encoding="utf-8")
+    path.chmod(0o755)
+    return path

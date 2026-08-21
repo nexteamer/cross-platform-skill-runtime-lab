@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import hashlib
+import os
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from candidate_core.codex import probe_codex
+from candidate_core.codex import default_requested, probe_codex
 from candidate_core.jsonio import write_json
 from short_essay.db import connect, get_run, upsert_run, upsert_stage
 
@@ -167,12 +168,16 @@ def _run_polish(
 def _call_codex(db, run_id: str, name: str, model: str, text: str, *, fail: bool) -> dict[str, Any]:
     upsert_stage(db, run_id, name, "running")
     extra = ["--fail", "crash"] if fail else None
-    probe = probe_codex(requested={"model": model, "transport": "fake-transport"}, extra_args=extra)
+    requested = default_requested()
+    if os.environ.get("PRODUCTCTL_ALLOW_REAL_CODEX") != "1":
+        requested = {"model": model, "transport": requested.get("transport") or "fake-transport"}
+    prompt = f"{model}\n\n{text}"
+    probe = probe_codex(requested=requested, extra_args=extra, prompt=prompt)
     if probe["status"] != "passed":
-        upsert_stage(db, run_id, name, "failed", "codex_probe_failed")
+        upsert_stage(db, run_id, name, "failed", probe.get("category") or "codex_probe_failed")
         return {
             "ok": False,
-            "category": "codex_probe_failed",
+            "category": probe.get("category") or "codex_probe_failed",
             "payload": {},
             "stderr": probe.get("stderr"),
             "retried": False,
