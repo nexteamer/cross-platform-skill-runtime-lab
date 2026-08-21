@@ -85,14 +85,25 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
     if command == "workflow.run":
         from short_essay.workflow import run_short_essay
 
-        payload = run_short_essay(args.text, data_root=Path(args.data_root))
-        ctx.add_stage(stage("workflow_run", "passed", observations=payload))
+        fail = [int(item) for item in (args.fail_candidates or "").split(",") if item]
+        payload = run_short_essay(
+            args.text,
+            data_root=Path(args.data_root),
+            polish_candidates=args.polish_candidates,
+            fail_candidates=fail,
+            timeout=args.timeout,
+            cancel=args.cancel,
+        )
+        status = payload["status"]
+        error = None if status in {"passed", "partial_success"} else error_payload("workflow_failed", status)
+        ctx.add_stage(stage("workflow_run", "passed" if status != "failed" else "failed", observations=payload, error=error))
         return build_envelope(
             run_id=payload["run_id"],
             command=ctx.command,
-            status="passed",
+            status=status,
             stages=ctx.stages,
             observations=payload,
+            error=error,
         )
     if command == "network.probe":
         result = probe_network(host=getattr(args, "host", "example.com"), url=getattr(args, "url", None))
@@ -334,6 +345,10 @@ def _build_parser() -> argparse.ArgumentParser:
     workflow_run = workflow_sub.add_parser("run")
     workflow_run.add_argument("--text", required=True)
     workflow_run.add_argument("--data-root", dest="data_root", required=True)
+    workflow_run.add_argument("--polish-candidates", dest="polish_candidates", type=int, default=2)
+    workflow_run.add_argument("--fail-candidates", dest="fail_candidates", default="")
+    workflow_run.add_argument("--timeout", type=float)
+    workflow_run.add_argument("--cancel", action="store_true")
 
     network = sub.add_parser("network", help="layered network probe")
     network_sub = network.add_subparsers(dest="action", required=True)
