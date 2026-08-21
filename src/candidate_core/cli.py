@@ -14,7 +14,10 @@ from candidate_core.jsonio import dumps
 from candidate_core.install import InstallError, install_product
 from candidate_core.lease import lease_release, lease_status
 from candidate_core.locks import LockError
+from candidate_core.artifacts import inventory, verify_artifacts
+from candidate_core.cleanup import cleanup_exact
 from candidate_core.codex import probe_codex, resolve_codex
+from candidate_core.diagnostics import collect_diagnostics
 from candidate_core.network import probe_network
 from candidate_core.payload import current_platform, verify_payload
 from candidate_core.process_probe import probe_pid
@@ -82,6 +85,26 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
         return _payload_verify(ctx, args)
     if command.startswith("service.") or command.startswith("lease."):
         return _service_or_lease(ctx, args, command)
+    if command == "artifacts.inventory":
+        result = inventory(Path(args.run_dir))
+        ctx.add_stage(stage("artifacts_inventory", "passed", observations=result))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status="passed", stages=ctx.stages, observations=result)
+    if command == "artifacts.verify":
+        result = verify_artifacts(Path(args.run_dir))
+        status = result["status"]
+        error = None if status == "passed" else error_payload(result.get("category") or "failed", "artifact verification failed")
+        ctx.add_stage(stage("artifacts_verify", "passed" if status == "passed" else "failed", observations=result, error=error))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status=status, stages=ctx.stages, observations=result, error=error)
+    if command == "diagnostics.collect":
+        result = collect_diagnostics(Path(args.run_dir))
+        ctx.add_stage(stage("diagnostics_collect", "passed", observations=result))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status="passed", stages=ctx.stages, observations=result)
+    if command == "cleanup.exact":
+        result = cleanup_exact(Path(args.run_dir), run_id=args.run_id)
+        status = result["status"]
+        error = None if status == "passed" else error_payload(result["category"], "cleanup refused")
+        ctx.add_stage(stage("cleanup_exact", "passed" if status == "passed" else "failed", observations=result, error=error))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status=status, stages=ctx.stages, observations=result, error=error)
     if command == "workflow.run":
         from short_essay.workflow import run_short_essay
 
@@ -339,6 +362,23 @@ def _build_parser() -> argparse.ArgumentParser:
         parser_action.add_argument("--run-id", dest="run_id")
         if action == "start":
             parser_action.add_argument("--owner", default="short-essay-lab")
+
+    artifacts = sub.add_parser("artifacts", help="run artifact inventory")
+    artifacts_sub = artifacts.add_subparsers(dest="action", required=True)
+    for action in ("inventory", "verify"):
+        parser_action = artifacts_sub.add_parser(action)
+        parser_action.add_argument("--run-dir", dest="run_dir", required=True)
+
+    diagnostics = sub.add_parser("diagnostics", help="sanitized diagnostics")
+    diagnostics_sub = diagnostics.add_subparsers(dest="action", required=True)
+    diagnostics_collect = diagnostics_sub.add_parser("collect")
+    diagnostics_collect.add_argument("--run-dir", dest="run_dir", required=True)
+
+    cleanup = sub.add_parser("cleanup", help="ownership-bounded cleanup")
+    cleanup_sub = cleanup.add_subparsers(dest="action", required=True)
+    cleanup_exact_cmd = cleanup_sub.add_parser("exact")
+    cleanup_exact_cmd.add_argument("--run-dir", dest="run_dir", required=True)
+    cleanup_exact_cmd.add_argument("--run-id", dest="run_id", required=True)
 
     workflow = sub.add_parser("workflow", help="product workflow")
     workflow_sub = workflow.add_subparsers(dest="action", required=True)
