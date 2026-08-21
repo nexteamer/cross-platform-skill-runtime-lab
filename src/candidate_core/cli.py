@@ -23,6 +23,7 @@ from candidate_core.network import probe_network
 from candidate_core.payload import current_platform, verify_payload
 from candidate_core.process_probe import probe_pid
 from candidate_core.runtime import discover_runtimes
+from candidate_core.doctor import run_doctor
 from candidate_core.service import preflight, start_service, status_service, stop_service
 
 
@@ -80,6 +81,15 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
         return run_core(ctx)
     if command == "install.run":
         return _install(ctx, args)
+    if command == "doctor.run":
+        result = run_doctor(
+            contract_path=Path(args.contract),
+            prefix=Path(args.prefix) if getattr(args, "prefix", None) else None,
+        )
+        status = result["status"]
+        error = None if status == "passed" else error_payload(result.get("failed_stage") or "doctor_failed", "doctor failed")
+        ctx.add_stage(stage("doctor", "passed" if status == "passed" else "failed", observations=result, error=error))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status=status, stages=ctx.stages, observations=result, error=error)
     if command == "runtime.discover":
         return _runtime_discover(ctx, args)
     if command == "payload.verify":
@@ -363,6 +373,12 @@ def _build_parser() -> argparse.ArgumentParser:
     install_run.add_argument("--prefix", required=True)
     install_run.add_argument("--python", required=True, help="absolute interpreter used to create the venv")
     install_run.add_argument("--data-root", dest="data_root")
+
+    doctor = sub.add_parser("doctor", help="validate the exact installation and environment")
+    doctor_sub = doctor.add_subparsers(dest="action", required=True)
+    doctor_run = doctor_sub.add_parser("run")
+    doctor_run.add_argument("--contract", required=True)
+    doctor_run.add_argument("--prefix")
     core.add_argument("--prefix", help="install prefix for acceptance")
     core.add_argument("--python", help="interpreter used when acceptance also installs")
 
