@@ -1,0 +1,12 @@
+{
+  "component": "psutil",
+  "version": "7.2.2",
+  "status": "adopted",
+  "capability": "process identity, child trees, executable paths, create time",
+  "constraints": [
+    "Access-denied and missing processes remain fail-closed and never imply ownership.",
+    "PID reuse is rejected when create_time or /proc starttime disagrees with the receipt.",
+    "A foreign listener is reported without being stopped."
+  ],
+  "fallback": "/proc on Linux when psutil is absent"
+}

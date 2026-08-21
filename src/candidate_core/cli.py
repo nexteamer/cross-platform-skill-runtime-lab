@@ -15,6 +15,7 @@ from candidate_core.install import InstallError, install_product
 from candidate_core.lease import lease_release, lease_status
 from candidate_core.locks import LockError
 from candidate_core.payload import current_platform, verify_payload
+from candidate_core.process_probe import probe_pid
 from candidate_core.runtime import discover_runtimes
 from candidate_core.service import preflight, start_service, status_service, stop_service
 
@@ -79,6 +80,19 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
         return _payload_verify(ctx, args)
     if command.startswith("service.") or command.startswith("lease."):
         return _service_or_lease(ctx, args, command)
+    if command == "process.probe":
+        result = probe_pid(int(args.pid))
+        status = result["status"]
+        error = None if status == "passed" else error_payload(result.get("category") or "failed", result.get("category") or "process probe failed")
+        ctx.add_stage(stage("process_probe", "passed" if status == "passed" else "failed", observations=result, error=error))
+        return build_envelope(
+            run_id=ctx.run_id,
+            command=ctx.command,
+            status=status,
+            stages=ctx.stages,
+            observations=result,
+            error=error,
+        )
     raise UsageError(f"unsupported command: {command}")
 
 
@@ -278,6 +292,11 @@ def _build_parser() -> argparse.ArgumentParser:
         parser_action.add_argument("--run-id", dest="run_id")
         if action == "start":
             parser_action.add_argument("--owner", default="short-essay-lab")
+
+    process = sub.add_parser("process", help="process identity evidence")
+    process_sub = process.add_subparsers(dest="action", required=True)
+    process_probe = process_sub.add_parser("probe")
+    process_probe.add_argument("--pid", required=True, type=int)
 
     lease = sub.add_parser("lease", help="service lease ownership")
     lease_sub = lease.add_subparsers(dest="action", required=True)
