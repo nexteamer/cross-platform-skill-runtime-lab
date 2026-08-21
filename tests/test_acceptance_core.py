@@ -7,6 +7,7 @@ from jsonschema import Draft202012Validator
 
 from candidate_core.resources import load_schema
 from tests.conftest import run_productctl
+from tests.helpers import path_with_bin, write_fake_python, write_payload
 
 
 def _envelope(proc) -> dict:
@@ -15,6 +16,9 @@ def _envelope(proc) -> dict:
 
 def test_valid_contract_produces_control_envelope(tmp_path: Path, contract_path: Path) -> None:
     evidence = tmp_path / "evidence"
+    bin_dir = tmp_path / "bin"
+    write_fake_python(bin_dir / "python3.12")
+    payload = write_payload(tmp_path / "payload")
     proc = run_productctl(
         "--json",
         "acceptance",
@@ -23,8 +27,11 @@ def test_valid_contract_produces_control_envelope(tmp_path: Path, contract_path:
         str(contract_path),
         "--evidence-root",
         str(evidence),
+        "--payload",
+        str(payload),
+        env={"PATH": path_with_bin(bin_dir)},
     )
-    assert proc.returncode == 0, proc.stderr
+    assert proc.returncode == 0, proc.stderr + proc.stdout
     envelope = _envelope(proc)
     Draft202012Validator(load_schema("control-envelope.schema.json")).validate(envelope)
     assert envelope["status"] == "passed"
@@ -33,6 +40,8 @@ def test_valid_contract_produces_control_envelope(tmp_path: Path, contract_path:
     assert [stage["id"] for stage in envelope["stages"]] == [
         "contract.validate",
         "historical_failures.map",
+        "runtime.discover",
+        "payload.verify",
         "acceptance.skeleton",
     ]
     assert all(stage["status"] == "passed" for stage in envelope["stages"])

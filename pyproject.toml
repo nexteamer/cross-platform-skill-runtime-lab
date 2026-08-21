@@ -24,7 +24,7 @@ productctl = "candidate_core.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-candidate_core = ["schemas/*.json", "data/*.json"]
+candidate_core = ["schemas/*.json", "data/*.json", "probes/*.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

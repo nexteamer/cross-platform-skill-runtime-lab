@@ -9,7 +9,9 @@ from candidate_core.contract import load_and_validate_contract
 from candidate_core.envelope import build_envelope, error_payload, stage
 from candidate_core.errors import ContractError
 from candidate_core.jsonio import write_json
+from candidate_core.payload import current_platform, verify_payload
 from candidate_core.registry import load_registry, summarize_registry
+from candidate_core.runtime import discover_runtimes
 
 
 COMMAND = "acceptance.core"
@@ -66,28 +68,94 @@ def run_core(ctx: CommandContext) -> dict[str, Any]:
     )
     ctx.add_observation("historical_failures", summary)
 
-    evidence_refs: list[dict[str, str]] = []
-    if ctx.evidence_root is not None:
-        evidence_refs = _write_run_evidence(ctx)
+    runtime = discover_runtimes(
+        contract["runtime"]["discovery"]["required_capabilities"],
+        path=ctx.search_path,
+    )
+    selected_runtime = runtime.get("selected")
+    if selected_runtime is None:
+        ctx.add_stage(
+            stage(
+                "runtime.discover",
+                "failed",
+                observations=runtime,
+                error=error_payload(
+                    "runtime_not_found",
+                    "no Python 3.11 or 3.12 candidate satisfied required capabilities",
+                ),
+            )
+        )
+        ctx.add_observation("runtime", runtime)
+        return _finish(ctx, status="failed", category="runtime_not_found")
 
+    ctx.add_stage(stage("runtime.discover", "passed", observations=runtime))
+    ctx.add_observation("runtime", runtime)
+
+    payload_root = ctx.payload_root
+    if payload_root is None and ctx.contract_path is not None:
+        payload_root = ctx.contract_path.parent / "payload"
+        ctx.payload_root = payload_root
+
+    python_series = selected_runtime["observations"].get("python_series")
+    target_platform = ctx.target_platform or current_platform()
+    payload = verify_payload(
+        payload_root,
+        target_platform=target_platform,
+        python_series=python_series,
+    )
+    if payload["status"] != "selected":
+        rejected = [
+            candidate
+            for candidate in payload["candidates"]
+            if candidate["status"] == "rejected"
+        ]
+        first_reason = (
+            rejected[0]["reasons"][0]["category"]
+            if rejected and rejected[0]["reasons"]
+            else "payload_rejected"
+        )
+        ctx.add_stage(
+            stage(
+                "payload.verify",
+                "failed",
+                observations=payload,
+                error=error_payload(first_reason, "payload verification rejected one or more required files"),
+            )
+        )
+        ctx.add_observation("payload", payload)
+        return _finish(ctx, status="failed", category=first_reason)
+
+    ctx.add_stage(stage("payload.verify", "passed", observations=payload))
+    ctx.add_observation("payload", payload)
+    ctx.add_observation("process_launched", False)
+    ctx.add_observation("install_attempted", False)
     ctx.add_stage(
         stage(
             "acceptance.skeleton",
             "passed",
             observations={"seam": "productctl acceptance core"},
-            evidence=evidence_refs,
         )
     )
-    ctx.add_observation("process_launched", False)
-    ctx.add_observation("install_attempted", False)
+    return _finish(ctx, status="passed")
 
+
+def _finish(ctx: CommandContext, *, status: str, category: str | None = None) -> dict[str, Any]:
+    ctx.add_observation("process_launched", ctx.observations.get("process_launched", False))
+    ctx.add_observation("install_attempted", ctx.observations.get("install_attempted", False))
+    if ctx.evidence_root is not None:
+        _write_run_evidence(ctx)
+    error = None if status == "passed" else error_payload(
+        category or "failed",
+        next((item["error"]["message"] for item in reversed(ctx.stages) if item.get("error")), "acceptance failed"),
+    )
     envelope = build_envelope(
         run_id=ctx.run_id,
         command=COMMAND,
-        status="passed",
+        status=status,
         stages=ctx.stages,
         observations=ctx.observations,
         evidence=ctx.evidence,
+        error=error,
         mutations=ctx.mutation.as_dicts(),
     )
     if ctx.evidence_root is not None:

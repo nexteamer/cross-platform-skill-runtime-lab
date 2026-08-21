@@ -15,6 +15,10 @@ class CommandContext:
     contract_path: Path | None = None
     contract: dict[str, Any] | None = None
     evidence_root: Path | None = None
+    payload_root: Path | None = None
+    search_path: str | None = None
+    target_platform: str | None = None
+    python_series: str | None = None
     mutation: MutationGuard = field(default_factory=MutationGuard)
     stages: list[dict[str, Any]] = field(default_factory=list)
     observations: dict[str, Any] = field(default_factory=dict)
