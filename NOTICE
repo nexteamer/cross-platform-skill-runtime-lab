@@ -1,0 +1,10 @@
+Cross-platform Skill Runtime Lab
+Copyright is reserved. This repository has no software license.
+
+Third-party components:
+
+- jsonschema 4.19.2 (MIT)
+- platformdirs 4.3.6 (MIT)
+- psutil 7.2.2 (BSD-3-Clause)
+- flask 3.0.3 (BSD-3-Clause)
+- pytest 9.0.3 (MIT; development/test only)

@@ -18,6 +18,7 @@ from candidate_core.artifacts import inventory, verify_artifacts
 from candidate_core.cleanup import cleanup_exact
 from candidate_core.codex import probe_codex, resolve_codex
 from candidate_core.diagnostics import collect_diagnostics
+from candidate_core.release import build_candidate, verify_candidate
 from candidate_core.network import probe_network
 from candidate_core.payload import current_platform, verify_payload
 from candidate_core.process_probe import probe_pid
@@ -85,6 +86,17 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
         return _payload_verify(ctx, args)
     if command.startswith("service.") or command.startswith("lease."):
         return _service_or_lease(ctx, args, command)
+    if command == "release.candidate":
+        root = Path(args.source_root) if args.source_root else Path.cwd()
+        result = build_candidate(Path(args.out), source_root=root)
+        ctx.add_stage(stage("release_candidate", "passed", observations=result))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status="passed", stages=ctx.stages, observations=result)
+    if command == "release.verify":
+        result = verify_candidate(Path(args.out))
+        status = result["status"]
+        error = None if status == "passed" else error_payload(result.get("category") or "failed", "release verify failed")
+        ctx.add_stage(stage("release_verify", "passed" if status == "passed" else "failed", observations=result, error=error))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status=status, stages=ctx.stages, observations=result, error=error)
     if command == "artifacts.inventory":
         result = inventory(Path(args.run_dir))
         ctx.add_stage(stage("artifacts_inventory", "passed", observations=result))
@@ -362,6 +374,14 @@ def _build_parser() -> argparse.ArgumentParser:
         parser_action.add_argument("--run-id", dest="run_id")
         if action == "start":
             parser_action.add_argument("--owner", default="short-essay-lab")
+
+    release = sub.add_parser("release", help="candidate core release artifacts")
+    release_sub = release.add_subparsers(dest="action", required=True)
+    release_candidate = release_sub.add_parser("candidate")
+    release_candidate.add_argument("--out", required=True)
+    release_candidate.add_argument("--source-root", dest="source_root")
+    release_verify = release_sub.add_parser("verify")
+    release_verify.add_argument("--out", required=True)
 
     artifacts = sub.add_parser("artifacts", help="run artifact inventory")
     artifacts_sub = artifacts.add_subparsers(dest="action", required=True)
