@@ -46,10 +46,23 @@ def write_fake_python(
     return path
 
 
-def make_wheel(path: Path, members: dict[str, bytes]) -> str:
+def make_wheel(path: Path, members: dict[str, bytes] | None = None) -> str:
+    payload = {
+        "candidate_core-0.1.0.dist-info/METADATA": (
+            b"Metadata-Version: 2.1\nName: candidate-core\nVersion: 0.1.0\n"
+        ),
+        "candidate_core-0.1.0.dist-info/WHEEL": (
+            b"Wheel-Version: 1.0\nGenerator: tests\nRoot-Is-Purelib: true\nTag: py3-none-any\n"
+        ),
+        "candidate_core-0.1.0.dist-info/RECORD": b"candidate_core/__init__.py,,\n",
+    }
+    if members is None:
+        payload["candidate_core/__init__.py"] = b'__version__ = "0.1.0"\n'
+    else:
+        payload.update(members)
     path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(path, "w") as archive:
-        for name, content in members.items():
+        for name, content in payload.items():
             archive.writestr(name, content)
     return hashlib.sha256(path.read_bytes()).hexdigest()
 

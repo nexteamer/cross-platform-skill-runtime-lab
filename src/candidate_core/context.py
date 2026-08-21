@@ -19,6 +19,10 @@ class CommandContext:
     search_path: str | None = None
     target_platform: str | None = None
     python_series: str | None = None
+    prefix: Path | None = None
+    python_executable: str | None = None
+    fail_stage: str | None = None
+    data_root_override: str | None = None
     mutation: MutationGuard = field(default_factory=MutationGuard)
     stages: list[dict[str, Any]] = field(default_factory=list)
     observations: dict[str, Any] = field(default_factory=dict)

@@ -11,6 +11,7 @@ from candidate_core.contract import load_and_validate_contract
 from candidate_core.envelope import build_envelope, error_payload, stage
 from candidate_core.errors import ProductctlError, UsageError
 from candidate_core.jsonio import dumps
+from candidate_core.install import InstallError, install_product
 from candidate_core.payload import current_platform, verify_payload
 from candidate_core.runtime import discover_runtimes
 
@@ -62,7 +63,13 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
             ctx.payload_root = Path(args.payload)
         if getattr(args, "target_platform", None):
             ctx.target_platform = args.target_platform
+        if getattr(args, "prefix", None):
+            ctx.prefix = Path(args.prefix)
+        if getattr(args, "python", None):
+            ctx.python_executable = args.python
         return run_core(ctx)
+    if command == "install.run":
+        return _install(ctx, args)
     if command == "runtime.discover":
         return _runtime_discover(ctx, args)
     if command == "payload.verify":
@@ -110,6 +117,41 @@ def _payload_verify(ctx: CommandContext, args: argparse.Namespace) -> dict[str, 
         stages=ctx.stages,
         observations=result,
         error=error,
+    )
+
+
+def _install(ctx: CommandContext, args: argparse.Namespace) -> dict[str, Any]:
+    ctx.contract_path = Path(args.contract)
+    contract = load_and_validate_contract(ctx.contract_path)
+    payload_root = Path(args.payload)
+    try:
+        result = install_product(
+            prefix=Path(args.prefix),
+            payload_root=payload_root,
+            python_executable=args.python,
+            app_id=contract["product"]["id"],
+            run_id=ctx.run_id,
+            data_root_override=getattr(args, "data_root", None),
+            inherit_to_children=contract["data_roots"]["inherit_to_children"],
+        )
+    except InstallError as exc:
+        ctx.add_stage(
+            stage("install", "failed", error=error_payload(exc.category, exc.message))
+        )
+        return build_envelope(
+            run_id=ctx.run_id,
+            command=ctx.command,
+            status="failed",
+            stages=ctx.stages,
+            error=error_payload(exc.category, exc.message),
+        )
+    ctx.add_stage(stage("install", "passed", observations=result))
+    return build_envelope(
+        run_id=ctx.run_id,
+        command=ctx.command,
+        status="passed",
+        stages=ctx.stages,
+        observations=result,
     )
 
 
@@ -168,6 +210,17 @@ def _build_parser() -> argparse.ArgumentParser:
     payload_verify.add_argument("--payload", help="payload directory containing manifest.json")
     payload_verify.add_argument("--python", help="target Python series, such as 3.12")
     payload_verify.add_argument("--target-platform", dest="target_platform")
+
+    install = sub.add_parser("install", help="transactional product install")
+    install_sub = install.add_subparsers(dest="action", required=True)
+    install_run = install_sub.add_parser("run", help="stage, promote, smoke, and receipt")
+    install_run.add_argument("--contract", required=True)
+    install_run.add_argument("--payload", required=True)
+    install_run.add_argument("--prefix", required=True)
+    install_run.add_argument("--python", required=True, help="absolute interpreter used to create the venv")
+    install_run.add_argument("--data-root", dest="data_root")
+    core.add_argument("--prefix", help="install prefix for acceptance")
+    core.add_argument("--python", help="interpreter used when acceptance also installs")
     return parser
 
 

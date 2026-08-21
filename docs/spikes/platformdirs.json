@@ -1,0 +1,16 @@
+{
+  "component": "platformdirs",
+  "version": "4.3.6",
+  "license": "MIT",
+  "status": "adopted",
+  "capability": "default data, config, cache, log, and runtime roots",
+  "constraints": [
+    "Explicit Product Adapter or CLI overrides always win.",
+    "Child processes inherit data_root from the install receipt or PRODUCTCTL_DATA_ROOT.",
+    "Children must not recompute platformdirs defaults independently."
+  ],
+  "platforms_tested": ["linux-x86_64"],
+  "known_gaps": [
+    "Windows and macOS Hosted CI confirmation remains in the later matrix ticket."
+  ]
+}
