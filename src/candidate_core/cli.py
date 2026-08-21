@@ -82,6 +82,18 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
         return _payload_verify(ctx, args)
     if command.startswith("service.") or command.startswith("lease."):
         return _service_or_lease(ctx, args, command)
+    if command == "workflow.run":
+        from short_essay.workflow import run_short_essay
+
+        payload = run_short_essay(args.text, data_root=Path(args.data_root))
+        ctx.add_stage(stage("workflow_run", "passed", observations=payload))
+        return build_envelope(
+            run_id=payload["run_id"],
+            command=ctx.command,
+            status="passed",
+            stages=ctx.stages,
+            observations=payload,
+        )
     if command == "network.probe":
         result = probe_network(host=getattr(args, "host", "example.com"), url=getattr(args, "url", None))
         status = result["status"]
@@ -316,6 +328,12 @@ def _build_parser() -> argparse.ArgumentParser:
         parser_action.add_argument("--run-id", dest="run_id")
         if action == "start":
             parser_action.add_argument("--owner", default="short-essay-lab")
+
+    workflow = sub.add_parser("workflow", help="product workflow")
+    workflow_sub = workflow.add_subparsers(dest="action", required=True)
+    workflow_run = workflow_sub.add_parser("run")
+    workflow_run.add_argument("--text", required=True)
+    workflow_run.add_argument("--data-root", dest="data_root", required=True)
 
     network = sub.add_parser("network", help="layered network probe")
     network_sub = network.add_subparsers(dest="action", required=True)
