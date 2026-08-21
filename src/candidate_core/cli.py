@@ -12,8 +12,11 @@ from candidate_core.envelope import build_envelope, error_payload, stage
 from candidate_core.errors import ProductctlError, UsageError
 from candidate_core.jsonio import dumps
 from candidate_core.install import InstallError, install_product
+from candidate_core.lease import lease_release, lease_status
+from candidate_core.locks import LockError
 from candidate_core.payload import current_platform, verify_payload
 from candidate_core.runtime import discover_runtimes
+from candidate_core.service import preflight, start_service, status_service, stop_service
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -74,6 +77,8 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
         return _runtime_discover(ctx, args)
     if command == "payload.verify":
         return _payload_verify(ctx, args)
+    if command.startswith("service.") or command.startswith("lease."):
+        return _service_or_lease(ctx, args, command)
     raise UsageError(f"unsupported command: {command}")
 
 
@@ -155,6 +160,49 @@ def _install(ctx: CommandContext, args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def _service_or_lease(ctx: CommandContext, args: argparse.Namespace, command: str) -> dict[str, Any]:
+    prefix = Path(args.prefix)
+    run_id = getattr(args, "run_id", None) or ctx.run_id
+    ctx.run_id = run_id
+    try:
+        if command == "service.preflight":
+            result = preflight(prefix)
+        elif command == "service.start":
+            result = start_service(prefix, run_id=run_id, owner=args.owner)
+        elif command == "service.status":
+            result = status_service(prefix)
+        elif command == "service.stop":
+            result = stop_service(prefix, run_id=run_id)
+        elif command == "lease.status":
+            result = lease_status(prefix)
+        elif command == "lease.release":
+            result = lease_release(prefix, run_id=run_id)
+        else:
+            raise UsageError(f"unsupported command: {command}")
+    except LockError as exc:
+        ctx.add_stage(stage(command.replace(".", "_"), "failed", error=error_payload(exc.category, exc.message)))
+        return build_envelope(
+            run_id=ctx.run_id,
+            command=ctx.command,
+            status="failed",
+            stages=ctx.stages,
+            error=error_payload(exc.category, exc.message),
+        )
+    status = result.get("status", "passed")
+    error = None
+    if status != "passed":
+        error = error_payload(result.get("category") or "failed", result.get("message") or status)
+    ctx.add_stage(stage(command.replace(".", "_"), "passed" if status == "passed" else "failed", observations=result, error=error))
+    return build_envelope(
+        run_id=ctx.run_id,
+        command=ctx.command,
+        status=status,
+        stages=ctx.stages,
+        observations=result,
+        error=error,
+    )
+
+
 def _command_name(args: argparse.Namespace) -> str:
     group = getattr(args, "group", None)
     action = getattr(args, "action", None)
@@ -221,6 +269,22 @@ def _build_parser() -> argparse.ArgumentParser:
     install_run.add_argument("--data-root", dest="data_root")
     core.add_argument("--prefix", help="install prefix for acceptance")
     core.add_argument("--python", help="interpreter used when acceptance also installs")
+
+    service = sub.add_parser("service", help="loopback service lifecycle")
+    service_sub = service.add_subparsers(dest="action", required=True)
+    for action in ("preflight", "start", "stop", "status"):
+        parser_action = service_sub.add_parser(action)
+        parser_action.add_argument("--prefix", required=True)
+        parser_action.add_argument("--run-id", dest="run_id")
+        if action == "start":
+            parser_action.add_argument("--owner", default="short-essay-lab")
+
+    lease = sub.add_parser("lease", help="service lease ownership")
+    lease_sub = lease.add_subparsers(dest="action", required=True)
+    for action in ("status", "release"):
+        parser_action = lease_sub.add_parser(action)
+        parser_action.add_argument("--prefix", required=True)
+        parser_action.add_argument("--run-id", dest="run_id")
     return parser
 
 

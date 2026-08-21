@@ -1,0 +1,14 @@
+{
+  "component": "portalocker / filelock",
+  "status": "deferred",
+  "selected": null,
+  "retained": "candidate_core.locks fcntl exclusive lock plus JSON owner record",
+  "reason": "The stdlib lock distinguishes busy, permission, stale, and foreign-owner and refuses unproved takeover. Third-party wrappers are not adopted until they preserve that fail-closed taxonomy on all target platforms.",
+  "fixtures": [
+    "contention",
+    "stale same-prefix reclaim",
+    "foreign stale refusal",
+    "permission not flattened to busy",
+    "exact path ownership"
+  ]
+}
