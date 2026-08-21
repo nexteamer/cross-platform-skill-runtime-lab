@@ -3,9 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import socketserver
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+
+class HealthServer(ThreadingHTTPServer):
+    def server_bind(self) -> None:
+        socketserver.TCPServer.server_bind(self)
+        host, port = self.socket.getsockname()[:2]
+        self.server_name = str(host)
+        self.server_port = int(port)
 
 
 class HealthHandler(BaseHTTPRequestHandler):
@@ -32,7 +41,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     sys.stderr.write("worker starting\n")
     sys.stderr.flush()
-    server = ThreadingHTTPServer((args.bind, 0), HealthHandler)
+    server = HealthServer((args.bind, 0), HealthHandler)
     port = server.server_address[1]
     port_path = Path(args.port_file)
     port_path.write_text(str(port) + "\n", encoding="utf-8")
