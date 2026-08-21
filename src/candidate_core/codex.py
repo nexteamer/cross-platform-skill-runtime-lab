@@ -215,6 +215,7 @@ def _probe_real(
             "--json",
             "--skip-git-repo-check",
             "--ephemeral",
+            "--ignore-user-config",
             "--color",
             "never",
             "-s",
@@ -225,7 +226,7 @@ def _probe_real(
             str(last),
             prompt or "Reply with a single word: ok",
         ]
-        result = run_argv(argv, timeout=timeout)
+        result = run_argv(argv, timeout=timeout, close_stdin=True)
         text = last.read_text(encoding="utf-8").strip() if last.is_file() else ""
     parsed = {
         "type": "result",

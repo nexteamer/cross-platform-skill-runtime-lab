@@ -26,6 +26,7 @@ def run_argv(
     env: Mapping[str, str] | None = None,
     timeout: float | None = None,
     stdin: str | None = None,
+    close_stdin: bool = False,
 ) -> ProcessResult:
     if not argv:
         raise ValueError("argv must not be empty")
@@ -35,7 +36,8 @@ def run_argv(
             command,
             cwd=cwd,
             env=dict(env) if env is not None else None,
-            input=stdin,
+            input=None if close_stdin else stdin,
+            stdin=subprocess.DEVNULL if close_stdin else None,
             capture_output=True,
             text=True,
             timeout=timeout,

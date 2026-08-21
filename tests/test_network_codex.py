@@ -120,6 +120,7 @@ def test_real_codex_probe_uses_exec_and_last_message(tmp_path: Path) -> None:
     assert obs["resolved"]["model"] == "lab-model"
     assert obs["resolved"]["transport"] == "chatgpt"
     assert "exec" in obs["launch"]["argv"]
+    assert "--ignore-user-config" in obs["launch"]["argv"]
     assert obs["parsed"]["text"] == "lab-ok"
     assert obs["silent_fallback"] is False
 

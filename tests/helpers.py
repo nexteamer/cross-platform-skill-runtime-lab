@@ -133,7 +133,7 @@ def write_stub_codex(bin_dir: Path, *, message: str = "ok") -> Path:
                 last = args[i + 1]
                 i += 2
                 continue
-            if args[i] in ("--json", "--skip-git-repo-check", "--ephemeral"):
+            if args[i] in ("--json", "--skip-git-repo-check", "--ephemeral", "--ignore-user-config"):
                 i += 1
                 continue
             if args[i] in ("--color", "-s", "-m", "--cd"):
