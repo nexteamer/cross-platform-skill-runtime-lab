@@ -14,6 +14,8 @@ from candidate_core.jsonio import dumps
 from candidate_core.install import InstallError, install_product
 from candidate_core.lease import lease_release, lease_status
 from candidate_core.locks import LockError
+from candidate_core.codex import probe_codex, resolve_codex
+from candidate_core.network import probe_network
 from candidate_core.payload import current_platform, verify_payload
 from candidate_core.process_probe import probe_pid
 from candidate_core.runtime import discover_runtimes
@@ -80,6 +82,28 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
         return _payload_verify(ctx, args)
     if command.startswith("service.") or command.startswith("lease."):
         return _service_or_lease(ctx, args, command)
+    if command == "network.probe":
+        result = probe_network(host=getattr(args, "host", "example.com"), url=getattr(args, "url", None))
+        status = result["status"]
+        error = None if status == "passed" else error_payload(result["category"], f"network probe failed at {result['failed_stage']}")
+        ctx.add_stage(stage("network_probe", "passed" if status == "passed" else "failed", observations=result, error=error))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status=status, stages=ctx.stages, observations=result, error=error)
+    if command == "codex.resolve":
+        result = resolve_codex(
+            requested={"model": args.model, "transport": args.transport},
+        )
+        ctx.add_stage(stage("codex_resolve", "passed", observations=result))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status="passed", stages=ctx.stages, observations=result)
+    if command == "codex.probe":
+        extra = ["--fail", args.fail] if getattr(args, "fail", None) else None
+        result = probe_codex(
+            requested={"model": args.model, "transport": args.transport},
+            extra_args=extra,
+        )
+        status = result["status"]
+        error = None if status == "passed" else error_payload("codex_probe_failed", result["launch"]["exit_category"])
+        ctx.add_stage(stage("codex_probe", "passed" if status == "passed" else "failed", observations=result, error=error))
+        return build_envelope(run_id=ctx.run_id, command=ctx.command, status=status, stages=ctx.stages, observations=result, error=error)
     if command == "process.probe":
         result = probe_pid(int(args.pid))
         status = result["status"]
@@ -292,6 +316,21 @@ def _build_parser() -> argparse.ArgumentParser:
         parser_action.add_argument("--run-id", dest="run_id")
         if action == "start":
             parser_action.add_argument("--owner", default="short-essay-lab")
+
+    network = sub.add_parser("network", help="layered network probe")
+    network_sub = network.add_subparsers(dest="action", required=True)
+    network_probe = network_sub.add_parser("probe")
+    network_probe.add_argument("--host", default="example.com")
+    network_probe.add_argument("--url")
+
+    codex = sub.add_parser("codex", help="fake or real Codex resolve/probe")
+    codex_sub = codex.add_subparsers(dest="action", required=True)
+    for action in ("resolve", "probe"):
+        parser_action = codex_sub.add_parser(action)
+        parser_action.add_argument("--model", default="fake-model")
+        parser_action.add_argument("--transport", default="fake-transport")
+        if action == "probe":
+            parser_action.add_argument("--fail")
 
     process = sub.add_parser("process", help="process identity evidence")
     process_sub = process.add_subparsers(dest="action", required=True)
