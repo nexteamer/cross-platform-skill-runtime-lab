@@ -30,6 +30,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--bind", default="127.0.0.1")
     parser.add_argument("--port-file", required=True)
     args = parser.parse_args(argv)
+    sys.stderr.write("worker starting\n")
+    sys.stderr.flush()
     server = ThreadingHTTPServer((args.bind, 0), HealthHandler)
     port = server.server_address[1]
     port_path = Path(args.port_file)

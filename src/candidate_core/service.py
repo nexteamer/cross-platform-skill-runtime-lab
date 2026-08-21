@@ -104,18 +104,20 @@ def start_service(
             stderr=log,
             env=env,
             cwd=str(install),
+            start_new_session=True,
         )
+        try:
+            port = _wait_for_port_file(port_file, timeout=15.0)
+        except Exception as exc:
+            proc.kill()
+            log.flush()
+            detail = log_path.read_text(encoding="utf-8") if log_path.exists() else str(exc)
+            raise ServiceError(
+                f"service did not publish a port (exit={proc.poll()}): {detail[-2000:]}",
+                category="service_start_timeout",
+            ) from exc
     finally:
         log.close()
-    try:
-        port = _wait_for_port_file(port_file, timeout=15.0)
-    except Exception as exc:
-        proc.kill()
-        detail = log_path.read_text(encoding="utf-8") if log_path.exists() else str(exc)
-        raise ServiceError(
-            f"service did not publish a port: {detail[-2000:]}",
-            category="service_start_timeout",
-        ) from exc
     receipt = {
         "pid": proc.pid,
         "port": port,
