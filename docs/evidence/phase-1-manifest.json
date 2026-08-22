@@ -1,0 +1,17 @@
+{
+  "claims": {
+    "desktop_e2e": "unproven",
+    "hosted_ci": "not Real Lab Canary",
+    "real_lab": "unproven"
+  },
+  "dependencies": {
+    "flask": "3.0.3",
+    "jsonschema": "4.19.2",
+    "platformdirs": "4.3.6",
+    "psutil": "7.2.2"
+  },
+  "name": "candidate-core",
+  "sha256": "298eba45df62db9a825e229fbff0209fa7791cd346022db3ec41b5acd8cd30ae",
+  "version": "0.1.0",
+  "wheel": "candidate_core-0.1.0-py3-none-any.whl"
+}

@@ -1,0 +1,87 @@
+{
+  "gate": "phase-1",
+  "status": "blocked",
+  "blocker": {
+    "ticket": 12,
+    "category": "codex_auth_missing",
+    "detail": "Windows post-restore repeat failed because the baseline ChatGPT refresh token is expired/invalid. First canary on the live logged-in Admin Codex home passed. Mac restore+repeat passed."
+  },
+  "candidate_core": {
+    "version": "0.1.0",
+    "commit": "a398888",
+    "sha256": "298eba45df62db9a825e229fbff0209fa7791cd346022db3ec41b5acd8cd30ae",
+    "wheel": "candidate_core-0.1.0-py3-none-any.whl",
+    "claims": {
+      "hosted_ci": "passed; not Real Lab Canary or Desktop E2E",
+      "real_lab": "macOS passed including restore+repeat; Windows first canary passed; Windows restore+repeat blocked on expired baseline token",
+      "desktop_e2e": "unproven"
+    }
+  },
+  "hosted_ci": {
+    "repo": "nexteamer/cross-platform-skill-runtime-lab",
+    "commit": "a398888",
+    "run": "https://github.com/nexteamer/cross-platform-skill-runtime-lab/actions/runs/32477471025",
+    "result": "success"
+  },
+  "windows_real_lab": {
+    "guest": "DESKTOP-2FJ6P9F",
+    "vm_uuid": "4805266a-64a5-4f85-b205-11b0c1cd76e7",
+    "baseline": "mini-pc-recovered-baseline-v2-20260818-2030",
+    "baseline_uuid": "2dad06ab-3dec-4f25-a914-4eeb7c77de35",
+    "codex_identity": {
+      "executable": "C:\\Users\\AgentOps\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.exe",
+      "codex_home": "C:\\Users\\Admin\\.codex",
+      "model": "gpt-5.6-luna",
+      "transport": "chatgpt"
+    },
+    "first_canary": {
+      "install_doctor": "passed",
+      "real_probe": "passed",
+      "real_workflow_run_id": "5cb59864-9e04-4403-8d09-1fcc63cf4563",
+      "artifacts_verify": "passed",
+      "diagnostics_collect": "passed"
+    },
+    "restore": {
+      "status": "passed",
+      "checkpoint": "mini-pc-recovered-baseline-v2-20260818-2030"
+    },
+    "repeat_after_restore": {
+      "install_doctor": "passed",
+      "real_probe": "failed",
+      "real_workflow_run_id": "1f5c30f3-122d-4975-8312-4eedf5daaefb",
+      "category": "codex_auth_missing",
+      "message": "Invalid refresh token / token_expired"
+    }
+  },
+  "macos_real_lab": {
+    "guest": "agent-mac-lab.shared",
+    "vm_uuid": "3b204f34-395b-4ee9-8688-64964eb687db",
+    "baseline": "配置好 Mac mini 以及 Codex",
+    "baseline_uuid": "b37d9657-28a5-4d16-af09-934182b4491d",
+    "codex_identity": {
+      "executable": "/Applications/ChatGPT.app/Contents/Resources/codex",
+      "model": "gpt-5.6-terra",
+      "transport": "chatgpt",
+      "login": "Logged in using ChatGPT"
+    },
+    "first_canary": {
+      "real_workflow_run_id": "a890fd1c-4ce3-47d8-b447-c43bd6ca95e0",
+      "result": "Raindrops trace quiet paths down the windowpane."
+    },
+    "repeat_after_restore": {
+      "restore": "passed",
+      "real_probe": "passed",
+      "real_workflow_run_id": "60d572d3-3f71-45ae-905c-95eaff87ef74",
+      "result": "A quiet harbour rests beneath the pale morning light.",
+      "artifacts_verify": "passed",
+      "diagnostics_collect": "passed"
+    }
+  },
+  "not_claimed": [
+    "Codex Desktop E2E",
+    "Windows recording proof",
+    "macOS recording proof",
+    "Public Image Phase 2",
+    "Phase 1 immutable release publication"
+  ]
+}
